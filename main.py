@@ -4,6 +4,7 @@ from sys import argv
 from lexer import Lexer
 from parser import Parser
 
+
 def main():
     cwd = getcwd()
     dir_files = listdir(cwd)
@@ -20,6 +21,7 @@ def main():
     interpreter = Interpreter(parser)
     result = interpreter.interpret()
     print(result)
+
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,6 @@
 from lexer import INTEGER, PLUS, MINUS, MUL, DIV, LPAREN, RPAREN, EOF, Lexer
 
+
 class AST(object):
     pass
 
@@ -57,7 +58,6 @@ class Parser(object):
             self.eat(MINUS)
             node = UnaryOp(token, self.factor())
             return node
-            
 
     def term(self):
         """term : factor ((MUL | DIV) factor)*"""

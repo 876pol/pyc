@@ -1,6 +1,7 @@
 from lexer import INTEGER, PLUS, MINUS, MUL, DIV, LPAREN, RPAREN, EOF
 from parser import Parser
 
+
 class NodeVisitor(object):
     def visit(self, node):
         method_name = 'visit_' + type(node).__name__
