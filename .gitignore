@@ -1,3 +1,5 @@
 __pycache__/
 .replit
 .vscode
+poetry.lock
+pyproject.toml

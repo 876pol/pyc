@@ -1,46 +1,77 @@
-# Token types
-#
-# EOF (end-of-file) token is used to indicate that
-# there is no more input left for lexical analysis
-INTEGER, PLUS, MINUS, MUL, DIV, LPAREN, RPAREN, EOF = (
-    'INTEGER', 'PLUS', 'MINUS', 'MUL', 'DIV', '(', ')', 'EOF'
-)
+from error import error
 
+class Token:
+    """Class that represents a token.
 
-class Token(object):
-    def __init__(self, type, value):
+    Attributes:
+        type (str): the type of token.
+        value (object): the value held by the token.
+    """
+
+    # List of all possible tokens
+    INTC, FLOATC, PLUS, MINUS, MUL, DIV, LRPAR, RRPAR, LCPAR, RCPAR, ASSIGN, TYPE, \
+    SEMI, EOF, SINGLE_COMMENT, LMULTI_COMMENT, RMULTI_COMMENT, INT, FLOAT, LOGICAL_AND, \
+    LOGICAL_OR, LOGICAL_NOT, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_EQUAL, GREATER_EQUAL, *_ = range(100)
+
+    def __init__(self, type: str, value: object):
+        """
+        Inits token class.
+        Args
+            type (str): the type of token.
+            value (object): the value held by the token.
+        """
         self.type = type
         self.value = value
 
-    def __str__(self):
-        """String representation of the class instance.
+# Dictionary that holds a list of keywords
+RESERVED_KEYWORDS = {
+    "int": Token(Token.INTC, "int"),
+    "float": Token(Token.FLOATC, "float")
+}
 
-        Examples:
-            Token(INTEGER, 3)
-            Token(PLUS, '+')
-            Token(MUL, '*')
+SYMBOLS = {
+    "+": Token(Token.PLUS, "+"),
+    "-": Token(Token.MINUS, "-"),
+    "*": Token(Token.MUL, "*"),
+    "/": Token(Token.DIV, "/"),
+    "(": Token(Token.LRPAR, "("),
+    ")": Token(Token.RRPAR, ")"),
+    "{": Token(Token.LCPAR, "{"),
+    "}": Token(Token.RCPAR, "}"),
+    "=": Token(Token.ASSIGN, "="),
+    ";": Token(Token.SEMI, ";"),
+    "&&": Token(Token.LOGICAL_AND, "&&"),
+    "||": Token(Token.LOGICAL_OR, "||"),
+    "!": Token(Token.LOGICAL_NOT, "!="),
+    "==": Token(Token.EQUAL, "=="),
+    "!=": Token(Token.NOT_EQUAL, "!="),
+    "<": Token(Token.LESS, "<"),
+    ">": Token(Token.GREATER, ">"),
+    "<=": Token(Token.LESS_EQUAL, "<="),
+    ">=": Token(Token.GREATER_EQUAL, ">=")
+}
+
+class Lexer:
+    """
+    Lexer class that parses the input into tokens.
+
+    Attributes:
+        text (str): the program source code.
+        pos (int): the index of the character that is currently being read.
+        current_char (str): the character that `pos` is pointing at.
+    """
+    
+    def __init__(self, text: str):
         """
-        return 'Token({type}, {value})'.format(
-            type=self.type,
-            value=repr(self.value)
-        )
-
-    def __repr__(self):
-        return self.__str__()
-
-
-class Lexer(object):
-    def __init__(self, text):
-        # client string input, e.g. "4 + 2 * 3 - 6 / 2"
+        Inits token class.
+        Args:
+            text (str): the program source code.
+        """
         self.text = text
-        # self.pos is an index into self.text
         self.pos = 0
         self.current_char = self.text[self.pos]
 
-    def error(self):
-        raise Exception('Invalid character')
-
-    def advance(self):
+    def advance(self) -> None:
         """Advance the `pos` pointer and set the `current_char` variable."""
         self.pos += 1
         if self.pos > len(self.text) - 1:
@@ -48,57 +79,116 @@ class Lexer(object):
         else:
             self.current_char = self.text[self.pos]
 
-    def skip_whitespace(self):
+    def skip_whitespace(self) -> None:
+        """Skips the following whitespace in the source code."""
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
 
-    def integer(self):
-        """Return a (multidigit) integer consumed from the input."""
-        result = ''
+    def skip_single_comment(self) -> None:
+        while self.current_char is not None and self.current_char != "\n":
+            self.advance()
+        self.advance()
+
+    def skip_multi_comment(self) -> None:
+        while self.current_char is not None and (self.current_char != "*" or self.peek() != "/"):
+            self.advance()
+        self.advance()
+        self.advance()
+
+    def get_number(self) -> Token:
+        """
+        Return a number consumed from the input.
+        Returns:
+            Token: token containing an int or a float.
+        """
+        result = ""
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
             self.advance()
-        return int(result)
+    
+        if self.current_char == ".":
+            result += self.current_char
+            self.advance()
+    
+            while (
+                self.current_char is not None and
+                self.current_char.isdigit()
+            ):
+                result += self.current_char
+                self.advance()
+    
+            token = Token(Token.FLOATC, float(result))
+        else:
+            token = Token(Token.INTC, int(result))
+    
+        return token
 
-    def get_next_token(self):
-        """Lexical analyzer (also known as scanner or tokenizer)
+    def get_variable(self) -> Token:
+        """
+        Return a variable or keyword consumed from the input.
+        Returns:
+            Token: the variable or keyword read.
+        """
+        result = ""
+        while self.current_char is not None and self.current_char.isalnum():
+            result += self.current_char
+            self.advance()
+        token = RESERVED_KEYWORDS.get(result, Token(Token.TYPE, result))
+        return token
 
-        This method is responsible for breaking a sentence
-        apart into tokens. One token at a time.
+    def peek(self) -> str:
+        """
+        Peeks into the character that follows `current_char`.
+        Returns:
+            str: the next character.
+        """
+        peek_pos = self.pos + 1
+        if peek_pos > len(self.text) - 1:
+            return None
+        else:
+            return self.text[peek_pos]
+
+    def get_next_symbol(self) -> Token:
+        if self.peek() != None:
+            s = self.current_char + self.peek()
+            if s in SYMBOLS:
+                self.advance()
+                self.advance()
+                return SYMBOLS[s]
+        s = self.current_char
+        if s in SYMBOLS:
+            self.advance()
+            return SYMBOLS[s]
+        error(f"Token not recognized: {self.current_char}")
+        
+        
+
+    def get_next_token(self) -> Token:
+        """
+        Lexical analyzer. This method is responsible for breaking
+        the code apart into tokens.
+        Returns:
+            Token: the next token.
         """
         while self.current_char is not None:
-
             if self.current_char.isspace():
                 self.skip_whitespace()
                 continue
 
+            if self.current_char == "/" and self.peek() == "/":
+                self.skip_single_comment()
+                continue
+
+            if self.current_char == "/" and self.peek() == "*":
+                self.skip_multi_comment()
+                continue
+
             if self.current_char.isdigit():
-                return Token(INTEGER, self.integer())
+                return self.get_number()
 
-            if self.current_char == '+':
-                self.advance()
-                return Token(PLUS, '+')
+            if self.current_char.isalpha():
+                return self.get_variable()
 
-            if self.current_char == '-':
-                self.advance()
-                return Token(MINUS, '-')
+            return self.get_next_symbol()
 
-            if self.current_char == '*':
-                self.advance()
-                return Token(MUL, '*')
-
-            if self.current_char == '/':
-                self.advance()
-                return Token(DIV, '/')
-
-            if self.current_char == '(':
-                self.advance()
-                return Token(LPAREN, '(')
-
-            if self.current_char == ')':
-                self.advance()
-                return Token(RPAREN, ')')
-
-            self.error()
-
-        return Token(EOF, None)
+        return Token(Token.EOF, None)
