@@ -2,14 +2,7 @@ from lexer import Token
 from parser import Parser
 from error import error
 from collections import namedtuple
-
-class SymbolTable(object):
-    def __init__(self):
-        self._symbols = {}
-
-    def insert(self, symbol):
-        print('Insert: %s' % symbol.name)
-        self._symbols[symbol.name] = symbol
+from chained_dict import ChainedDict
 
 Return = namedtuple("Return", "type value")
 
@@ -29,7 +22,7 @@ class NodeVisitor(object):
 class Interpreter(NodeVisitor):
     def __init__(self, parser):
         self.parser = parser
-        self.GLOBAL_SCOPE = {}
+        self.scopes = ChainedDict()
 
     def visit_UnaryOp(self, node):
         op = node.op.type
@@ -94,8 +87,11 @@ class Interpreter(NodeVisitor):
             return Return("int", node.value)
 
     def visit_Block(self, node):
+        self.scopes.push()
         for child in node.children:
             self.visit(child)
+        print(self.scopes)
+        self.scopes.pop()
 
     def visit_NoOp(self, node):
         pass
@@ -104,39 +100,38 @@ class Interpreter(NodeVisitor):
         var_type = node.type.value
         var_name = node.left.value
         var_visit = self.visit(node.right)
-        if var_name in self.GLOBAL_SCOPE:
+        if var_name in self.scopes.dicts[-1]:
             error(f"Redeclaration of {var_name}")
         if var_type == "int" and var_visit.type == "float":
-            self.GLOBAL_SCOPE[var_name] = Return("int", int(var_visit.value))
+            self.scopes.insert(var_name, Return("int", int(var_visit.value)))
         elif var_type == "float" and var_visit.type == "int":
-            self.GLOBAL_SCOPE[var_name] = Return("float", float(var_visit.value))
+            self.scopes.insert(var_name, Return("float", float(var_visit.value)))
         elif var_type == var_visit.type:
-            self.GLOBAL_SCOPE[var_name] = var_visit
+            self.scopes.insert(var_name, var_visit)
         else:
             error(f"Mismatched types, expected {var_type} found {var_visit.type}")
 
     def visit_Assign(self, node):
         var_name = node.left.value
         var_visit = self.visit(node.right)
-        if var_name not in self.GLOBAL_SCOPE:
+        if var_name not in self.scopes:
             error(f"Unknown symbol: {var_name}")
-        if self.GLOBAL_SCOPE[var_name].type == "int" and var_visit.type == "float":
-            self.GLOBAL_SCOPE[var_name] = Return("int", int(var_visit.value))
-        elif self.GLOBAL_SCOPE[var_name].type == "float" and var_visit.type == "int":
-            self.GLOBAL_SCOPE[var_name] = Return("float", float(var_visit.value))
-        elif self.GLOBAL_SCOPE[var_name].type == var_visit.type:
-            self.GLOBAL_SCOPE[var_name] = var_visit
+        if self.scopes.get(var_name).type == "int" and var_visit.type == "float":
+            self.scopes.set(var_name, Return("int", int(var_visit.value)))
+        elif self.scopes.get(var_name).type == "float" and var_visit.type == "int":
+            self.scopes.set(var_name, Return("float", float(var_visit.value)))
+        elif self.scopes.get(var_name).type == var_visit.type:
+            self.scopes.set(var_name, var_visit)
         else:
-            error(f"Mismatched types, expected {self.GLOBAL_SCOPE[var_name].type} found {var_visit.type}")
+            error(f"Mismatched types, expected {self.scopes.get(var_name).type} found {var_visit.type}")
         
 
     def visit_Type(self, node):
         var_name = node.value
-        val = self.GLOBAL_SCOPE.get(var_name)
-        if val is None:
+        if var_name not in self.scopes:
             error(f"Unknown symbol: {repr(var_name)}")
         else:
-            return val        
+            return self.scopes.get(var_name)        
 
     def interpret(self):
         tree = self.parser.parse()

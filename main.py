@@ -28,7 +28,6 @@ def main():
     parser = Parser(lexer)
     interpreter = Interpreter(parser)
     interpreter.interpret()
-    print(interpreter.GLOBAL_SCOPE)
 
 
 if __name__ == "__main__":

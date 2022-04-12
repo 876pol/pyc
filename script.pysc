@@ -1,4 +1,9 @@
 {
     int a = 1;
+    {
+        int c = a;
+        int a = 0;
+    }
     int b = 3 | 4;
+    int d = a + c;
 }
