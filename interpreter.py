@@ -3,6 +3,14 @@ from parser import Parser
 from error import error
 from collections import namedtuple
 
+class SymbolTable(object):
+    def __init__(self):
+        self._symbols = {}
+
+    def insert(self, symbol):
+        print('Insert: %s' % symbol.name)
+        self._symbols[symbol.name] = symbol
+
 Return = namedtuple("Return", "type value")
 
 class NodeVisitor(object):
@@ -11,7 +19,7 @@ class NodeVisitor(object):
         visitor = getattr(self, method_name, self.generic_visit)
         ret = visitor(node)
         if ret == None:
-            return Return("null", "null")
+            return Return("null", None)
         return ret
 
     def generic_visit(self, node):
@@ -28,6 +36,12 @@ class Interpreter(NodeVisitor):
         v = self.visit(node.expr)
         if op == Token.MINUS:
             return Return(v.type, -self.visit(node.expr).value)
+        elif op == Token.BIT_NOT:
+            if v.type == "float":
+                error("Mismatched types, expected INTC found FLOATC")
+            return Return("int", ~self.visit(node.expr).value)
+        elif op == Token.LOGICAL_NOT:
+            return Return("int", int(not int(self.visit(node.expr).value)))
 
     def visit_BinOp(self, node):
         l = self.visit(node.left)
@@ -41,8 +55,37 @@ class Interpreter(NodeVisitor):
             return Return(type, l.value * r.value)
         elif node.op.type == Token.DIV and type == "float":
             return Return(type, l.value / r.value)
-        else:
+        elif node.op.type == Token.DIV:
             return Return(type, l.value // r.value)
+        elif node.op.type == Token.EQUAL:
+            return Return("int", int(l.value == r.value))
+        elif node.op.type == Token.NOT_EQUAL:
+            return Return("int", int(l.value != r.value))
+        elif node.op.type == Token.LESS:
+            return Return("int", int(l.value < r.value))
+        elif node.op.type == Token.GREATER:
+            return Return("int", int(l.value > r.value))
+        elif node.op.type == Token.LESS_EQUAL:
+            return Return("int", int(l.value <= r.value))
+        elif node.op.type == Token.GREATER_EQUAL:
+            return Return("int", int(l.value >= r.value))
+        elif node.op.type == Token.LOGICAL_AND:
+            return Return("int", int(bool(l.value) and bool(r.value)))
+        elif node.op.type == Token.LOGICAL_OR:
+            return Return("int", int(bool(l.value) or bool(r.value)))
+        if type == "float":
+            error("Mismatched types, expected INTC found FLOATC")
+        if node.op.type == Token.BIT_AND:
+            return Return("int", l.value & r.value)
+        elif node.op.type == Token.BIT_OR:
+            return Return("int", l.value | r.value)
+        elif node.op.type == Token.BIT_XOR:
+            return Return("int", l.value ^ r.value)
+        elif node.op.type == Token.BIT_LSHIFT:
+            return Return("int", l.value << r.value)
+        elif node.op.type == Token.BIT_RSHIFT:
+            return Return("int", l.value >> r.value)
+        
 
     def visit_Num(self, node):
         if node.token.type == Token.FLOATC:

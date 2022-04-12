@@ -80,8 +80,8 @@ class Parser(object):
         else:
             error(f"Expected {repr(token_type)}, recieved {repr(self.current_token.type)}")
 
-    def factor(self):
-        """factor : INTEGER | LPAREN expr RPAREN"""
+    def number(self) -> AST:
+        """number : (MINUS | BIT_NOT)* (INTEGER | LPAREN expression RPAREN)"""
         token = self.current_token
         if token.type == Token.INTC:
             self.eat(Token.INTC)
@@ -91,20 +91,28 @@ class Parser(object):
             return Num(token)
         elif token.type == Token.LRPAR:
             self.eat(Token.LRPAR)
-            node = self.expr()
+            node = self.expression()
             self.eat(Token.RRPAR)
             return node
         elif token.type == Token.MINUS:
             self.eat(Token.MINUS)
-            node = UnaryOp(token, self.factor())
+            node = UnaryOp(token, self.number())
+            return node
+        elif token.type == Token.BIT_NOT:
+            self.eat(Token.BIT_NOT)
+            node = UnaryOp(token, self.number())
+            return node
+        elif token.type == Token.LOGICAL_NOT:
+            self.eat(Token.LOGICAL_NOT)
+            node = UnaryOp(token, self.number())
             return node
         else:
             node = self.variable()
             return node
 
-    def term(self):
-        """term : factor ((MUL | DIV) factor)*"""
-        node = self.factor()
+    def multiplicative(self) -> AST:
+        """multiplication : number ((MUL | DIV) number)*"""
+        node = self.number()
 
         while self.current_token.type in (Token.MUL, Token.DIV):
             token = self.current_token
@@ -113,17 +121,15 @@ class Parser(object):
             elif token.type == Token.DIV:
                 self.eat(Token.DIV)
 
-            node = BinOp(left=node, op=token, right=self.factor())
+            node = BinOp(left=node, op=token, right=self.number())
 
         return node
 
-    def expr(self):
+    def additive(self) -> AST:
         """
-        expr   : term ((PLUS | MINUS) term)*
-        term   : factor ((MUL | DIV) factor)*
-        factor : INTEGER | LPAREN expr RPAREN
+        addition : multiplication ((PLUS | MINUS) multiplication)*
         """
-        node = self.term()
+        node = self.multiplicative()
 
         while self.current_token.type in (Token.PLUS, Token.MINUS):
             token = self.current_token
@@ -132,9 +138,57 @@ class Parser(object):
             elif token.type == Token.MINUS:
                 self.eat(Token.MINUS)
 
-            node = BinOp(left=node, op=token, right=self.term())
+            node = BinOp(left=node, op=token, right=self.multiplicative())
 
+        return node          
+
+    def comparative(self) -> AST:
+        """
+        compare : addition | (addition (EQUAL | NOT_EQUAL | LESS | GREATER | LESS_EQUAL | GREATER_EQUAL) addition)
+        """
+        node = self.additive()
+        op = (Token.EQUAL, Token.NOT_EQUAL, Token.LESS, Token.GREATER, Token.LESS_EQUAL, Token.GREATER_EQUAL)
+        token = self.current_token
+        if token.type in op:
+            for type in op:
+                if token.type == type:
+                    self.eat(type)
+                    node = BinOp(left=node, op=token, right=self.additive())
+                    return node
+        else:
+            return node
+
+    def bitwise(self) -> AST:
+        """
+        compare : comparative | (comparative (BIT_AND | BIT_OR | BIT_XOR | BIT_LSHIFT | BIT_RSHIFT) comparative)
+        """
+        node = self.comparative()
+        op = (Token.BIT_AND, Token.BIT_OR, Token.LESS, Token.BIT_XOR, Token.BIT_LSHIFT, Token.BIT_RSHIFT)
+        token = self.current_token
+        while token.type in op:
+            for type in op:
+                if token.type == type:
+                    self.eat(type)
+                    node = BinOp(left=node, op=token, right=self.comparative())
+                    token = self.current_token
+                    break
         return node
+
+    def logical(self) -> AST:
+        node = self.bitwise()
+        op = (Token.LOGICAL_AND, Token.LOGICAL_OR)
+        token = self.current_token
+        while token.type in op:
+            for type in op:
+                if token.type == type:
+                    self.eat(type)
+                    node = BinOp(left=node, op=token, right=self.bitwise())
+                    token = self.current_token
+                    break
+        return node
+
+    def expression(self) -> AST:
+        return self.logical()
 
     def program(self):
         """program : compound_statement DOT"""
@@ -198,7 +252,7 @@ class Parser(object):
         left = self.variable()
         token = self.current_token
         self.eat(Token.ASSIGN)
-        right = self.expr()
+        right = self.expression()
         node = Declare(type, left, token, right)
         return node
 
@@ -209,7 +263,7 @@ class Parser(object):
         left = self.variable()
         token = self.current_token
         self.eat(Token.ASSIGN)
-        right = self.expr()
+        right = self.expression()
         node = Assign(left, token, right)
         return node
 

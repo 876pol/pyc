@@ -19,8 +19,11 @@ def main():
         error("Error: No source file found")
         return
 
+    # Read the source code into a variable
     file = open(argv[1], "r")
     code = file.read()
+
+    
     lexer = Lexer(code)
     parser = Parser(lexer)
     interpreter = Interpreter(parser)

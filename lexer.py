@@ -8,11 +8,6 @@ class Token:
         value (object): the value held by the token.
     """
 
-    # List of all possible tokens
-    INTC, FLOATC, PLUS, MINUS, MUL, DIV, LRPAR, RRPAR, LCPAR, RCPAR, ASSIGN, TYPE, \
-    SEMI, EOF, SINGLE_COMMENT, LMULTI_COMMENT, RMULTI_COMMENT, INT, FLOAT, LOGICAL_AND, \
-    LOGICAL_OR, LOGICAL_NOT, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_EQUAL, GREATER_EQUAL, *_ = range(100)
-
     def __init__(self, type: str, value: object):
         """
         Inits token class.
@@ -22,6 +17,13 @@ class Token:
         """
         self.type = type
         self.value = value
+
+# List of all possible tokens
+for token in ["INTC", "FLOATC", "PLUS", "MINUS", "MUL", "DIV", "LRPAR", "RRPAR", "LCPAR", "RCPAR", "ASSIGN", "TYPE", \
+    "SEMI", "EOF", "SINGLE_COMMENT", "LMULTI_COMMENT", "RMULTI_COMMENT", "INT", "FLOAT", "LOGICAL_AND", \
+    "LOGICAL_OR", "LOGICAL_NOT", "EQUAL", "NOT_EQUAL", "LESS", "GREATER", "LESS_EQUAL", "GREATER_EQUAL", \
+    "BIT_AND", "BIT_OR", "BIT_XOR", "BIT_NOT", "BIT_LSHIFT", "BIT_RSHIFT"]:
+    setattr(Token, token, token)
 
 # Dictionary that holds a list of keywords
 RESERVED_KEYWORDS = {
@@ -42,13 +44,20 @@ SYMBOLS = {
     ";": Token(Token.SEMI, ";"),
     "&&": Token(Token.LOGICAL_AND, "&&"),
     "||": Token(Token.LOGICAL_OR, "||"),
-    "!": Token(Token.LOGICAL_NOT, "!="),
+    "!": Token(Token.LOGICAL_NOT, "!"),
     "==": Token(Token.EQUAL, "=="),
     "!=": Token(Token.NOT_EQUAL, "!="),
     "<": Token(Token.LESS, "<"),
     ">": Token(Token.GREATER, ">"),
     "<=": Token(Token.LESS_EQUAL, "<="),
-    ">=": Token(Token.GREATER_EQUAL, ">=")
+    ">=": Token(Token.GREATER_EQUAL, ">="),
+    "&": Token(Token.BIT_AND, "&"),
+    "|": Token(Token.BIT_OR, "|"),
+    "^": Token(Token.BIT_XOR, "^"),
+    "~": Token(Token.BIT_NOT, "~"),
+    "<<": Token(Token.BIT_LSHIFT, "<<"),
+    ">>": Token(Token.BIT_RSHIFT, ">>")
+
 }
 
 class Lexer:
