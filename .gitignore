@@ -1,4 +1,5 @@
 __pycache__/
+interpreter/__pycache__
 .replit
 .vscode
 poetry.lock
