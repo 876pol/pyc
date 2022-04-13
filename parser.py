@@ -1,5 +1,5 @@
-from lexer import Token, Lexer
-from error import error
+from lexer import Token, Lexer, TokenType
+from error import ParserError, ErrorCode
 
 
 class AST:
@@ -54,7 +54,7 @@ class Assign(AST):
 
 
 class Type(AST):
-    """The Type node is constructed out of ID token."""
+    """The Type node is constructed out of ID TokenType."""
     def __init__(self, token):
         self.token = token
         self.value = token.value
@@ -78,32 +78,32 @@ class Parser(object):
         if self.current_token.type == token_type:
             self.current_token = self.lexer.get_next_token()
         else:
-            error(f"Expected {repr(token_type)}, recieved {repr(self.current_token.type)}")
+            self.error(ErrorCode.UNEXPECTED_TOKEN, self.current_token)
 
     def number(self) -> AST:
         """number : (MINUS | BIT_NOT)* (INTEGER | LPAREN expression RPAREN)"""
         token = self.current_token
-        if token.type == Token.INTC:
-            self.eat(Token.INTC)
+        if token.type == TokenType.INTC:
+            self.eat(TokenType.INTC)
             return Num(token)
-        elif token.type == Token.FLOATC:
-            self.eat(Token.FLOATC)
+        elif token.type == TokenType.FLOATC:
+            self.eat(TokenType.FLOATC)
             return Num(token)
-        elif token.type == Token.LRPAR:
-            self.eat(Token.LRPAR)
+        elif token.type == TokenType.LRPAR:
+            self.eat(TokenType.LRPAR)
             node = self.expression()
-            self.eat(Token.RRPAR)
+            self.eat(TokenType.RRPAR)
             return node
-        elif token.type == Token.MINUS:
-            self.eat(Token.MINUS)
+        elif token.type == TokenType.MINUS:
+            self.eat(TokenType.MINUS)
             node = UnaryOp(token, self.number())
             return node
-        elif token.type == Token.BIT_NOT:
-            self.eat(Token.BIT_NOT)
+        elif token.type == TokenType.BIT_NOT:
+            self.eat(TokenType.BIT_NOT)
             node = UnaryOp(token, self.number())
             return node
-        elif token.type == Token.LOGICAL_NOT:
-            self.eat(Token.LOGICAL_NOT)
+        elif token.type == TokenType.LOGICAL_NOT:
+            self.eat(TokenType.LOGICAL_NOT)
             node = UnaryOp(token, self.number())
             return node
         else:
@@ -114,12 +114,14 @@ class Parser(object):
         """multiplication : number ((MUL | DIV) number)*"""
         node = self.number()
 
-        while self.current_token.type in (Token.MUL, Token.DIV):
+        while self.current_token.type in (TokenType.MUL, TokenType.DIV, TokenType.MOD):
             token = self.current_token
-            if token.type == Token.MUL:
-                self.eat(Token.MUL)
-            elif token.type == Token.DIV:
-                self.eat(Token.DIV)
+            if token.type == TokenType.MUL:
+                self.eat(TokenType.MUL)
+            elif token.type == TokenType.DIV:
+                self.eat(TokenType.DIV)
+            elif token.type == TokenType.MOD:
+                self.eat(TokenType.MOD)
 
             node = BinOp(left=node, op=token, right=self.number())
 
@@ -131,12 +133,12 @@ class Parser(object):
         """
         node = self.multiplicative()
 
-        while self.current_token.type in (Token.PLUS, Token.MINUS):
+        while self.current_token.type in (TokenType.PLUS, TokenType.MINUS):
             token = self.current_token
-            if token.type == Token.PLUS:
-                self.eat(Token.PLUS)
-            elif token.type == Token.MINUS:
-                self.eat(Token.MINUS)
+            if token.type == TokenType.PLUS:
+                self.eat(TokenType.PLUS)
+            elif token.type == TokenType.MINUS:
+                self.eat(TokenType.MINUS)
 
             node = BinOp(left=node, op=token, right=self.multiplicative())
 
@@ -147,7 +149,7 @@ class Parser(object):
         compare : addition | (addition (EQUAL | NOT_EQUAL | LESS | GREATER | LESS_EQUAL | GREATER_EQUAL) addition)
         """
         node = self.additive()
-        op = (Token.EQUAL, Token.NOT_EQUAL, Token.LESS, Token.GREATER, Token.LESS_EQUAL, Token.GREATER_EQUAL)
+        op = (TokenType.EQUAL, TokenType.NOT_EQUAL, TokenType.LESS, TokenType.GREATER, TokenType.LESS_EQUAL, TokenType.GREATER_EQUAL)
         token = self.current_token
         if token.type in op:
             for type in op:
@@ -163,7 +165,7 @@ class Parser(object):
         compare : comparative | (comparative (BIT_AND | BIT_OR | BIT_XOR | BIT_LSHIFT | BIT_RSHIFT) comparative)
         """
         node = self.comparative()
-        op = (Token.BIT_AND, Token.BIT_OR, Token.LESS, Token.BIT_XOR, Token.BIT_LSHIFT, Token.BIT_RSHIFT)
+        op = (TokenType.BIT_AND, TokenType.BIT_OR, TokenType.LESS, TokenType.BIT_XOR, TokenType.BIT_LSHIFT, TokenType.BIT_RSHIFT)
         token = self.current_token
         while token.type in op:
             for type in op:
@@ -176,7 +178,7 @@ class Parser(object):
 
     def logical(self) -> AST:
         node = self.bitwise()
-        op = (Token.LOGICAL_AND, Token.LOGICAL_OR)
+        op = (TokenType.LOGICAL_AND, TokenType.LOGICAL_OR)
         token = self.current_token
         while token.type in op:
             for type in op:
@@ -199,9 +201,9 @@ class Parser(object):
         """
         compound_statement: BEGIN statement_list END
         """
-        self.eat(Token.LCPAR)
+        self.eat(TokenType.LCPAR)
         nodes = self.statement_list()
-        self.eat(Token.RCPAR)
+        self.eat(TokenType.RCPAR)
     
         root = Block()
         root.children.extend(nodes)
@@ -212,7 +214,7 @@ class Parser(object):
         statement_list : statement SEMI statement_list
         """
         results = []
-        while self.current_token.type != Token.RCPAR:
+        while self.current_token.type != TokenType.RCPAR:
             results.append(self.statement())
         return results
 
@@ -222,36 +224,35 @@ class Parser(object):
                   | assignment_statement
                   | declaration_statement
         """
-        if self.current_token.type == Token.LCPAR:
+        if self.current_token.type == TokenType.LCPAR:
             node = self.compound_statement()
-        elif self.current_token.type == Token.TYPE:
+        elif self.current_token.type == TokenType.TYPE:
             node = self.assignment_statement()
-            self.eat(Token.SEMI)
-        elif self.current_token.type in (Token.INTC, Token.FLOATC):
+            self.eat(TokenType.SEMI)
+        elif self.current_token.type in (TokenType.INTC, TokenType.FLOATC):
             node = self.declaration_statement()
-            self.eat(Token.SEMI)
-        elif self.current_token.type == Token.SEMI:
+            self.eat(TokenType.SEMI)
+        elif self.current_token.type == TokenType.SEMI:
             node = self.empty()
-            self.eat(Token.SEMI)
+            self.eat(TokenType.SEMI)
         else:
-            error(f"Expected LCPAR, TYPE, SEMI, received {self.current_token.type}")
+            self.error(ErrorCode.UNEXPECTED_TOKEN, self.current_token)
         return node
 
     def declaration_statement(self):
         """
         declaration_statement : INTC variable ASSIGN expr | FLOATC variable ASSIGN expr
         """
-        if self.current_token.type == Token.INTC:
-            type = Token(Token.INTC, "int")
-            self.eat(Token.INTC)
-        elif self.current_token.type == Token.FLOATC:
-            type = Token(Token.FLOAT, "float")
-            self.eat(Token.FLOATC)
+        type = self.current_token
+        if type.type == TokenType.INTC:
+            self.eat(TokenType.INTC)
+        elif self.type.type == TokenType.FLOATC:
+            self.eat(TokenType.FLOATC)
         else:
-            error(f"Expected INT, FLOAT, received {self.current_token.type}")
+            self.error(ErrorCode.UNEXPECTED_TOKEN, self.current_token)
         left = self.variable()
         token = self.current_token
-        self.eat(Token.ASSIGN)
+        self.eat(TokenType.ASSIGN)
         right = self.expression()
         node = Declare(type, left, token, right)
         return node
@@ -262,7 +263,7 @@ class Parser(object):
         """
         left = self.variable()
         token = self.current_token
-        self.eat(Token.ASSIGN)
+        self.eat(TokenType.ASSIGN)
         right = self.expression()
         node = Assign(left, token, right)
         return node
@@ -272,7 +273,7 @@ class Parser(object):
         variable : ID
         """
         node = Type(self.current_token)
-        self.eat(Token.TYPE)
+        self.eat(TokenType.TYPE)
         return node
 
     def empty(self):
@@ -281,6 +282,9 @@ class Parser(object):
 
     def parse(self):
         node = self.program()
-        if self.current_token.type != Token.EOF:
-            error(f"Expected EOF, recieved {self.current_token.type}")
+        if self.current_token.type != TokenType.EOF:
+            self.error(ErrorCode.UNEXPECTED_TOKEN, self.current_token)
         return node
+
+    def error(self, error_code, token):
+        raise ParserError(f"{error_code.value} -> {token}")
