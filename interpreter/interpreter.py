@@ -6,11 +6,12 @@ from linked_dict import LinkedDict
 
 Return = namedtuple("Return", "type value")
 
+
 class NodeVisitor(object):
     def visit(self, node):
         method_name = "visit_" + type(node).__name__
         visitor = getattr(self, method_name, self.generic_visit)
-        ret = visitor(node)            
+        ret = visitor(node)
         return ret
 
     def generic_visit(self, node):
@@ -35,8 +36,8 @@ class Interpreter(NodeVisitor):
             return Return("int", int(not int(self.visit(node.expr).value)))
 
     def visit_BinOp(self, node):
-        l = self.visit(node.left)
-        r = self.visit(node.right)
+        l = self.visit(node.expr_left)
+        r = self.visit(node.expr_right)
         type = "float" if "float" in (l.type, r.type) else "int"
         if node.op.type == TokenType.PLUS:
             return Return(type, l.value + r.value)
@@ -78,7 +79,6 @@ class Interpreter(NodeVisitor):
             return Return("int", l.value >> r.value)
         elif node.op.type == TokenType.MOD:
             return Return("int", l.value % r.value)
-        
 
     def visit_Num(self, node):
         if node.token.type == TokenType.FLOATC:
@@ -86,16 +86,26 @@ class Interpreter(NodeVisitor):
         elif node.token.type == TokenType.INTC:
             return Return("int", node.value)
 
+    def visit_DeclFunc(self, node):
+        func_type = node.type
+        func_name = node.name.value
+        func_args = node.args
+        func_body = node.body
+        if func_name in self.scopes.peek():
+            self.error(ErrorCode.DUPLICATE_ID, node.type)
+        self.scopes.insert(func_name, (func_type, func_args, func_body))
+        return Return("void", None)
+
     def visit_Block(self, node):
         self.scopes.push()
         for child in node.children:
             self.visit(child)
         print(self.scopes)
         self.scopes.pop()
-        return Return("null", None)
+        return Return("void", None)
 
     def visit_NoOp(self, node):
-        return Return("null", None)
+        return Return("void", None)
 
     def visit_Declare(self, node):
         var_type = node.type.value
@@ -111,7 +121,7 @@ class Interpreter(NodeVisitor):
             self.scopes.insert(var_name, var_visit)
         else:
             self.error(ErrorCode.MISMATCHED_TYPE, var_visit.type)
-        return Return("null", None)
+        return Return("void", None)
 
     def visit_Assign(self, node):
         var_name = node.left.value
@@ -126,19 +136,21 @@ class Interpreter(NodeVisitor):
             self.scopes.set(var_name, var_visit)
         else:
             self.error(ErrorCode.MISMATCHED_TYPE, var_visit.type)
-        return Return("null", None)
-        
+        return Return("void", None)
 
     def visit_Type(self, node):
         var_name = node.value
         if var_name not in self.scopes:
             self.error(ErrorCode.ID_NOT_FOUND, node.token)
         else:
-            return self.scopes.get(var_name)        
+            return self.scopes.get(var_name)
 
     def interpret(self):
         tree = self.parser.parse()
-        return self.visit(tree)
+        self.scopes.push()
+        self.visit(tree)
+        self.visit(self.scopes.get("main")[2])
+        self.scopes.pop()
 
     def error(self, error_code, token):
         raise SemanticError(f"{error_code.value} -> {token}")

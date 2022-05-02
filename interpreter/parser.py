@@ -1,8 +1,8 @@
-from lexer import Token, Lexer, TokenType
+from token import Token, TokenType
 from error import ParserError, ErrorCode
 
 
-class AST:
+class AST(object):
     """Class that represents a node in the abstract syntax tree."""
     pass
 
@@ -10,20 +10,28 @@ class AST:
 class UnaryOp(AST):
     """
     Node that represents a unary operator.
+
     Attributes:
-        
+        op (Token): the operator.
+        expr (AST): expression that returns a number.
     """
-    def __init__(self, op, expr):
-        self.token = self.op = op
+    def __init__(self, op: Token, expr: AST):
+        self.op = op
         self.expr = expr
 
 
 class BinOp(AST):
-    """Node that represents a binary operator."""
-    def __init__(self, left, op, right):
-        self.left = left
-        self.token = self.op = op
-        self.right = right
+    """
+    Node that represents a binary operator.
+
+    Attributes:
+        op (Token): the operator.
+        expr_left, expr_right (AST): the two expressions that the operator will act upon.
+    """
+    def __init__(self, expr_left: AST, op: Token, expr_right: AST):
+        self.expr_left = expr_left
+        self.op = op
+        self.expr_right = expr_right
 
 
 class Num(AST):
@@ -36,7 +44,14 @@ class Block(AST):
     """Represents a 'BEGIN ... END' block"""
     def __init__(self):
         self.children = []
+        
 
+class DeclFunc(AST):
+    def __init__(self, type, name, args: list, body: Block):
+        self.type = type
+        self.name = name
+        self.args = args
+        self.body = body
 
 class Declare(AST):
     def __init__(self, type, left, op, right):
@@ -113,7 +128,6 @@ class Parser(object):
     def multiplicative(self) -> AST:
         """multiplication : number ((MUL | DIV) number)*"""
         node = self.number()
-
         while self.current_token.type in (TokenType.MUL, TokenType.DIV, TokenType.MOD):
             token = self.current_token
             if token.type == TokenType.MUL:
@@ -123,8 +137,7 @@ class Parser(object):
             elif token.type == TokenType.MOD:
                 self.eat(TokenType.MOD)
 
-            node = BinOp(left=node, op=token, right=self.number())
-
+            node = BinOp(expr_left=node, op=token, expr_right=self.number())
         return node
 
     def additive(self) -> AST:
@@ -140,7 +153,7 @@ class Parser(object):
             elif token.type == TokenType.MINUS:
                 self.eat(TokenType.MINUS)
 
-            node = BinOp(left=node, op=token, right=self.multiplicative())
+            node = BinOp(expr_left=node, op=token, expr_right=self.multiplicative())
 
         return node          
 
@@ -155,7 +168,7 @@ class Parser(object):
             for type in op:
                 if token.type == type:
                     self.eat(type)
-                    node = BinOp(left=node, op=token, right=self.additive())
+                    node = BinOp(expr_left=node, op=token, expr_right=self.additive())
                     return node
         else:
             return node
@@ -171,7 +184,7 @@ class Parser(object):
             for type in op:
                 if token.type == type:
                     self.eat(type)
-                    node = BinOp(left=node, op=token, right=self.comparative())
+                    node = BinOp(expr_left=node, op=token, expr_right=self.comparative())
                     token = self.current_token
                     break
         return node
@@ -184,7 +197,7 @@ class Parser(object):
             for type in op:
                 if token.type == type:
                     self.eat(type)
-                    node = BinOp(left=node, op=token, right=self.bitwise())
+                    node = BinOp(expr_left=node, op=token, expr_right=self.bitwise())
                     token = self.current_token
                     break
         return node
@@ -194,8 +207,35 @@ class Parser(object):
 
     def program(self):
         """program : compound_statement DOT"""
-        node = self.compound_statement()
+        node = self.function()
         return node
+
+    def function(self) -> AST:
+        type = self.current_token
+        self.eat(TokenType.VOID)
+        name = self.variable()
+        self.eat(TokenType.LRPAR)
+        args = []
+        if self.current_token.type != TokenType.RRPAR:
+            curr_token = self.current_token
+            if curr_token.type in (TokenType.INTC, TokenType.FLOATC):
+                self.eat(curr_token.type)
+            else:
+                self.error(ErrorCode.UNEXPECTED_TOKEN, self.current_token)
+            var = self.variable()
+            args.append((curr_token, var.token))
+        while self.current_token.type != TokenType.RRPAR:
+            self.eat(TokenType.COMMA)
+            curr_token = self.current_token
+            if curr_token.type in (TokenType.INTC, TokenType.FLOATC):
+                self.eat(curr_token.type)
+            else:
+                self.error(ErrorCode.UNEXPECTED_TOKEN, self.current_token)
+            var = self.variable()
+            args.append((curr_token, var.token))
+        self.eat(TokenType.RRPAR)
+        body = self.compound_statement()
+        return DeclFunc(type, name, args, body)
 
     def compound_statement(self):
         """
@@ -243,18 +283,16 @@ class Parser(object):
         """
         declaration_statement : INTC variable ASSIGN expr | FLOATC variable ASSIGN expr
         """
-        type = self.current_token
-        if type.type == TokenType.INTC:
-            self.eat(TokenType.INTC)
-        elif self.type.type == TokenType.FLOATC:
-            self.eat(TokenType.FLOATC)
+        curr_token = self.current_token
+        if curr_token.type in (TokenType.INTC, TokenType.FLOATC):
+            self.eat(curr_token.type)
         else:
             self.error(ErrorCode.UNEXPECTED_TOKEN, self.current_token)
         left = self.variable()
         token = self.current_token
         self.eat(TokenType.ASSIGN)
         right = self.expression()
-        node = Declare(type, left, token, right)
+        node = Declare(curr_token, left, token, right)
         return node
 
     def assignment_statement(self):

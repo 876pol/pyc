@@ -1,3 +1,4 @@
-{
-    int a = 5.0; // Here
+void main(int b) {
+    int a = 5 + (6 * 3 ) % 3;
+    int b = 234;
 }
