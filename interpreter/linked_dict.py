@@ -10,11 +10,13 @@ class LinkedDict(object):
     scope. To search through higher scopes, traverse up the nodes in the linked list.
 
     Attributes:
-        top (DictNode): the node at the peek of the stack.
+        top (DictNode): the node at the top of the stack.
+        bottom (DictNode): the node at the bottom of the stack.
     """
     def __init__(self):
         """Inits LinkedDict class."""
-        self.top = DictNode(None)
+        self.top = DictNode(DictNode(None))
+        self.bottom = self.top
 
     def get(self, key) -> object:
         """

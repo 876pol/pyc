@@ -32,20 +32,13 @@ class Token(object):
     __repr__ = __str__
 
 
-# Dictionary that maps token identifiers to symbols. These identifiers 
-# and symbols will be added to the TokenType enum class.
+# Dictionary containing all special symbols and characters. These identifiers 
+# and keywords will be added to the TokenType enum class.
 SYMBOL = {"PLUS": "+",
           "MINUS": "-",
           "MUL": "*",
           "DIV": "/",
           "MOD": "%",
-          "LRPAR": "(",
-          "RRPAR": ")",
-          "LCPAR": "{",
-          "RCPAR": "}",
-          "ASSIGN": "=",
-          "SEMI": ";",
-          "COMMA": ",",
           "LOGICAL_AND": "&&",
           "LOGICAL_OR": "||",
           "LOGICAL_NOT": "!",
@@ -60,24 +53,49 @@ SYMBOL = {"PLUS": "+",
           "BIT_XOR": "^",
           "BIT_NOT": "~",
           "BIT_LSHIFT": "<<",
-          "BIT_RSHIFT": ">>"}
+          "BIT_RSHIFT": ">>",
+          "ASSIGN": "=",
+          "PLUS_ASSIGN": "+=",
+          "MINUS_ASSIGN": "-=",
+          "MUL_ASSIGN": "*=",
+          "DIV_ASSIGN": "/=",
+          "MOD_ASSIGN": "%=",
+          "BIT_AND_ASSIGN": "&=",
+          "BIT_OR_ASSIGN": "|=",
+          "BIT_XOR_ASSIGN": "^=",
+          "BIT_LSHIFT_ASSIGN": "<<=",
+          "BIT_RSHIFT_ASSIGN": ">>=",
+          "LRPAR": "(",
+          "RRPAR": ")",
+          "LCPAR": "{",
+          "RCPAR": "}",
+          "SEMI": ";",
+          "COMMA": ",",
+         }
 
 # Dictionary that maps token identifiers to keywords. These identifiers 
 # and keywords will be added to the TokenType enum class.
 KEYWORD = {"INTC": "int",
            "FLOATC": "float",
-           "VOID": "void"}
+           "STRING": "string",
+           "FUNCTION": "function",
+           "IF": "if",
+           "ELSE": "else",
+           "FOR": "for",
+           "WHILE": "while",
+           "DO": "do"
+          }
 
 # Dictionary that maps token identifiers to miscellaneous symbols. These identifiers 
 # and miscellaneous symbols will be added to the TokenType enum class.
 OTHER = {"EOF": "EOF",
-         "TYPE": "TYPE"}  # Represents a variable / function.
+         "TYPE": "TYPE",
+        }
 
 
 class TokenType(Enum):
     """Enum class that contains all the different types of tokens."""
     pass
-
 
 # Add all the entries from the SYMBOL, KEYWORD, and OTHER dictionaries into the TokenType enum.
 for k, v in SYMBOL.items():

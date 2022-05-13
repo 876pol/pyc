@@ -1,4 +1,11 @@
-void main(int b) {
-    int a = 5 + (6 * 3 ) % 3;
-    int b = 234;
+function test(int a, int b) {
+    if (a == 0) {
+        printi(b);
+    } else {
+        test(b % a, a);
+    }
+}
+
+function main() {
+    test(1024, 64);
 }

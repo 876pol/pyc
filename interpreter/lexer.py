@@ -1,5 +1,5 @@
 from error import LexerError
-from token import Token, TokenType, SYMBOLS, RESERVED_KEYWORDS
+from token import RESERVED_KEYWORDS, SYMBOLS, Token, TokenType 
 
 class Lexer(object):
     """
@@ -15,7 +15,7 @@ class Lexer(object):
 
     def __init__(self, text: str):
         """
-        Inits token class.
+        Inits lexer class.
         Args:
             text (str): the program source code.
         """
@@ -43,6 +43,19 @@ class Lexer(object):
         else:
             self.current_char = self.text[self.pos]
             self.column += 1
+
+    def peek(self) -> str:
+        """
+        Peeks into the character that follows `current_char`.
+        Returns:
+            str: the next character.
+        """
+        # If the end of the input is reached, return None.
+        if self.pos + 1 > len(self.text) - 1:
+            return None
+        else:
+            # Otherwise return the next character.
+            return self.text[self.pos + 1]
 
     def skip_whitespace(self) -> None:
         """Skips the following whitespace in the source code."""
@@ -91,6 +104,28 @@ class Lexer(object):
             # Return the int token.
             return Token(TokenType.INTC, int(result), line=self.line, column=self.column)
 
+    def get_string(self) -> Token:
+        """
+        Return a string literal consumed from the input.
+        Returns:
+            Token: token containing a string literal.
+        """
+        # Read the opening quotation mark.
+        self.advance()
+
+        # Keep reading characters until the current character is another quotation mark.
+        result = ""
+        while self.current_char is not None and self.current_char != "\"":
+            result += self.current_char
+            self.advance()
+
+        # Read the closing quotation mark.
+        if self.current_char == "\"":
+            self.advance()
+
+        # Return the string token.
+        return Token(TokenType.STRING, result, line=self.line, column=self.column)
+        
     def get_variable(self) -> Token:
         """
         Return a variable or keyword consumed from the input.
@@ -109,19 +144,6 @@ class Lexer(object):
 
         # Return the token containing a type.
         return Token(TokenType.TYPE, result, line=self.line, column=self.column)
-
-    def peek(self) -> str:
-        """
-        Peeks into the character that follows `current_char`.
-        Returns:
-            str: the next character.
-        """
-        # If the end of the input is reached, return None.
-        if self.pos + 1 > len(self.text) - 1:
-            return None
-        else:
-            # Otherwise return the next character.
-            return self.text[self.pos + 1]
 
     def get_next_symbol(self) -> Token:
         """
@@ -147,7 +169,7 @@ class Lexer(object):
             return Token(SYMBOLS[s], s, line=self.line, column=self.column)
 
         # Throw an error is no symbol is found.
-        self.error()
+        self.error()        
 
     def get_next_token(self) -> Token:
         """
@@ -174,6 +196,10 @@ class Lexer(object):
                 self.skip_multi_comment()
                 continue
 
+            # If the current character is a quotation mark, return a string token.
+            if self.current_char == "\"":
+                return self.get_string()
+
             # If the current character is a digit, return a number token.
             if self.current_char.isdigit():
                 return self.get_number()
@@ -188,6 +214,6 @@ class Lexer(object):
         # If there is nothing left in the input, return an EOF token.
         return Token(TokenType.EOF, None, line=self.line, column=self.column)
 
-    def error(self):
+    def error(self) -> None:
         """Throws an error and states the current character, line, and column on which the error happened"""
         raise LexerError(f"Lexer error on '{self.current_char}' -> position={self.line}:{self.column}")
