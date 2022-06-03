@@ -9,14 +9,13 @@ from error import FileError
 def main():
     # Check if the user provided a source file.
     if len(argv) <= 1:
-        FileError("Error: No source file provided")
-        return
+        raise FileError("No source file provided")
 
     # Check if the provided source files exists.
     cwd = getcwd()
     dir_files = listdir(cwd)
     if argv[1] not in dir_files:
-        FileError("Error: No source file found")
+        raise FileError("No source file found")
         return
 
     # Read the source code into a variable.

@@ -1,3 +1,11 @@
-{
-    int a = 5.0; // Here
+function gcd(int a, int b) {
+    if (a == 0) {
+        printi(b);
+    } else {
+        gcd(b % a, a);
+    }
+}
+
+function main() {
+    gcd(1024, 64);
 }

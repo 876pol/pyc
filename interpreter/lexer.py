@@ -1,98 +1,7 @@
 from error import LexerError
-from enum import Enum
+from token import RESERVED_KEYWORDS, SYMBOLS, Token, TokenType 
 
-class Token(object):
-    """
-    Class that represents a token.
-
-    Attributes:
-        type (str): the type of token.
-        value (object): the value held by the token.
-        line (int): the current line being read.
-        column (int): the index of the character on the current line that is being read.
-    """
-
-    def __init__(self, type: str, value: object, line=-1, column=-1):
-        """
-        Inits token class.
-        Args:
-            type (str): the type of token.
-            value (object): the value held by the token.
-            line (int): the current line being read.
-            column (int): the index of the character on the current line that is being read.
-        """
-        self.type = type
-        self.value = value
-        self.lineno = line
-        self.column = column
-
-    def __str__(self) -> str:
-        """String representation of the class instance."""
-        return f"Token({self.type}, {repr(self.value)}, position={self.lineno}:{self.column})"
-
-    __repr__ = __str__
-
-
-# Dictionary that maps token identifiers to symbols. These identifiers 
-# and symbols will be added to the TokenType enum class.
-SYMBOL = {"PLUS": "+",
-    "MINUS": "-",
-    "MUL": "*",
-    "DIV": "/",
-    "MOD": "%",
-    "LRPAR": "(",
-    "RRPAR": ")",
-    "LCPAR": "{",
-    "RCPAR": "}",
-    "ASSIGN": "=",
-    "SEMI": ";",
-    "LOGICAL_AND": "&&",
-    "LOGICAL_OR": "||",
-    "LOGICAL_NOT": "!",
-    "EQUAL": "==",
-    "NOT_EQUAL": "!=",
-    "LESS": "<",
-    "GREATER": ">",
-    "LESS_EQUAL": "<=",
-    "GREATER_EQUAL": ">=",
-    "BIT_AND": "&",
-    "BIT_OR": "|",
-    "BIT_XOR": "^",
-    "BIT_NOT": "~",
-    "BIT_LSHIFT": "<<",
-    "BIT_RSHIFT": ">>"}
-
-# Dictionary that maps token identifiers to keywords. These identifiers 
-# and keywords will be added to the TokenType enum class.
-KEYWORD = {"INTC": "int",
-    "FLOATC": "float"}
-
-# Dictionary that maps token identifiers to miscellaneous symbols. These identifiers 
-# and miscellaneous symbols will be added to the TokenType enum class.
-OTHER = {"EOF": "EOF",
-    "TYPE": "TYPE"} # Represents a variable / function.
-
-class TokenType(Enum):
-    """Enum class that contains all the different types of tokens."""
-    pass
-
-# Add all the entries from the SYMBOL, KEYWORD, and OTHER dictionaries into the TokenType enum.
-for k, v in SYMBOL.items():
-    setattr(TokenType, k, v)
-for k, v in KEYWORD.items():
-    setattr(TokenType, k, v)
-for k, v in OTHER.items():
-    setattr(TokenType, k, v)
-
-# Map the symbols and keywords to their respective tokens.
-# This lets us match them in O(1) time.
-SYMBOLS = {v: getattr(TokenType, k)
-           for k, v in SYMBOL.items()}
-RESERVED_KEYWORDS = {v: getattr(TokenType, k)
-                     for k, v in KEYWORD.items()}
-
-
-class Lexer:
+class Lexer(object):
     """
     Lexer class that parses the input into tokens.
 
@@ -103,10 +12,10 @@ class Lexer:
         line (int): the current line being read.
         column (int): the index of the character on the current line that is being read.
     """
-    
+
     def __init__(self, text: str):
         """
-        Inits token class.
+        Inits lexer class.
         Args:
             text (str): the program source code.
         """
@@ -134,6 +43,19 @@ class Lexer:
         else:
             self.current_char = self.text[self.pos]
             self.column += 1
+
+    def peek(self) -> str:
+        """
+        Peeks into the character that follows `current_char`.
+        Returns:
+            str: the next character.
+        """
+        # If the end of the input is reached, return None.
+        if self.pos + 1 > len(self.text) - 1:
+            return None
+        else:
+            # Otherwise return the next character.
+            return self.text[self.pos + 1]
 
     def skip_whitespace(self) -> None:
         """Skips the following whitespace in the source code."""
@@ -182,6 +104,28 @@ class Lexer:
             # Return the int token.
             return Token(TokenType.INTC, int(result), line=self.line, column=self.column)
 
+    def get_string(self) -> Token:
+        """
+        Return a string literal consumed from the input.
+        Returns:
+            Token: token containing a string literal.
+        """
+        # Read the opening quotation mark.
+        self.advance()
+
+        # Keep reading characters until the current character is another quotation mark.
+        result = ""
+        while self.current_char is not None and self.current_char != "\"":
+            result += self.current_char
+            self.advance()
+
+        # Read the closing quotation mark.
+        if self.current_char == "\"":
+            self.advance()
+
+        # Return the string token.
+        return Token(TokenType.STRING, result, line=self.line, column=self.column)
+        
     def get_variable(self) -> Token:
         """
         Return a variable or keyword consumed from the input.
@@ -201,19 +145,6 @@ class Lexer:
         # Return the token containing a type.
         return Token(TokenType.TYPE, result, line=self.line, column=self.column)
 
-    def peek(self) -> str:
-        """
-        Peeks into the character that follows `current_char`.
-        Returns:
-            str: the next character.
-        """
-        # If the end of the input is reached, return None.
-        if self.pos + 1 > len(self.text) - 1:
-            return None
-        else:
-            # Otherwise return the next character.
-            return self.text[self.pos + 1]
-
     def get_next_symbol(self) -> Token:
         """
         Returns a Token corresponding to the next symbol present in the input.
@@ -231,7 +162,6 @@ class Lexer:
                 self.advance()
                 return Token(SYMBOLS[s], s, line=self.line, column=self.column)
 
-        
         # Checks if `current_char` is a valid symbol, if so, return a token corresponding to it.
         s = self.current_char
         if s in SYMBOLS:
@@ -239,9 +169,7 @@ class Lexer:
             return Token(SYMBOLS[s], s, line=self.line, column=self.column)
 
         # Throw an error is no symbol is found.
-        self.error()
-        
-        
+        self.error()        
 
     def get_next_token(self) -> Token:
         """
@@ -268,6 +196,10 @@ class Lexer:
                 self.skip_multi_comment()
                 continue
 
+            # If the current character is a quotation mark, return a string token.
+            if self.current_char == "\"":
+                return self.get_string()
+
             # If the current character is a digit, return a number token.
             if self.current_char.isdigit():
                 return self.get_number()
@@ -282,6 +214,6 @@ class Lexer:
         # If there is nothing left in the input, return an EOF token.
         return Token(TokenType.EOF, None, line=self.line, column=self.column)
 
-    def error(self):
+    def error(self) -> None:
         """Throws an error and states the current character, line, and column on which the error happened"""
         raise LexerError(f"Lexer error on '{self.current_char}' -> position={self.line}:{self.column}")
