@@ -1,11 +1,11 @@
-function test(int a, int b) {
+function gcd(int a, int b) {
     if (a == 0) {
         printi(b);
     } else {
-        test(b % a, a);
+        gcd(b % a, a);
     }
 }
 
 function main() {
-    test(1024, 64);
+    gcd(1024, 64);
 }
