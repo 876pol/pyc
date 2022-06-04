@@ -6,11 +6,6 @@ int gcd(int a, int b) {
     }
 }
 
-int test() {
-    return 1;
-}
-
 void main() {
-    test();
-    printi(inputi());
+    printi(gcd(inputi(), inputi()));
 }
