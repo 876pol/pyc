@@ -1,5 +1,6 @@
-from token import Token, TokenType
+from tokens import Token, TokenType
 from collections import namedtuple
+
 
 class AST(object):
     """Class that represents a node in the abstract syntax tree."""
@@ -15,7 +16,8 @@ class UnaryOperator(AST):
         expression (AST): expression that returns a value.
         token (Token): the token that is printed when an error is thrown.
     """
-    def __init__(self, operator: TokenType, expression: AST, token: Token=None):
+
+    def __init__(self, operator: TokenType, expression: AST, token: Token = None):
         self.operator = operator
         self.expression = expression
         self.token = token
@@ -30,7 +32,8 @@ class BinaryOperator(AST):
         expr_left, expr_right (AST): the two expressions that the operator will act upon.
         token (Token): the token that is printed when an error is thrown.
     """
-    def __init__(self, expr_left: AST, operator: TokenType, expr_right: AST, token: Token=None):
+
+    def __init__(self, expr_left: AST, operator: TokenType, expr_right: AST, token: Token = None):
         self.expr_left = expr_left
         self.operator = operator
         self.expr_right = expr_right
@@ -45,6 +48,7 @@ class Val(AST):
         type (TokenType): the type of value held.
         value (Any): the value that is being held by the type.
     """
+
     def __init__(self, token: Token):
         self.type = token.type
         self.value = token.value
@@ -59,14 +63,11 @@ class Variable(AST):
         value (object): the value that is being held by the variable.
         token (Token): the token that is printed when an error is thrown.
     """
-    def __init__(self, type: TokenType, value: object, token: Token=None):
+
+    def __init__(self, type: TokenType, value: object, token: Token = None):
         self.type = type
         self.value = value
         self.token = token
-
-
-class NoOperation(AST):
-    pass
 
 
 class DeclarationStatement(AST):
@@ -78,6 +79,7 @@ class DeclarationStatement(AST):
         name (Variable): the name of the variable.
         expression (AST): the value that the variable will be assigned to.
     """
+
     def __init__(self, type: TokenType, name: Variable, expression: AST):
         self.type = type
         self.name = name
@@ -94,12 +96,12 @@ class AssignmentStatement(AST):
         expression (AST): the expression that the variable will be assigned to.
         token (Token): the token that is printed when an error is thrown.
     """
-    def __init__(self, name: Variable, operator: TokenType, expression: AST, token: Token=None):
+
+    def __init__(self, name: Variable, operator: TokenType, expression: AST, token: Token = None):
         self.name = name
         self.operator = operator
         self.expression = expression
         self.token = token
-
 
 
 class Block(AST):
@@ -109,6 +111,7 @@ class Block(AST):
     Attributes:
         children (list[AST]): list of AST nodes to run.
     """
+
     def __init__(self, children: list):
         self.children = children
 
@@ -123,6 +126,7 @@ class IfElse(AST):
         otherwise (Block): block of code to run if no conditions have been met. This is `None` 
         if there is no else block.
     """
+
     def __init__(self, conditional: list, otherwise: Block):
         self.conditional = conditional
         self.otherwise = otherwise
@@ -138,6 +142,7 @@ class ForLoop(AST):
         increment (AST): runs this code every time the loop finishes.
         block (Block): code to loop through.
     """
+
     def __init__(self, init: AST, condition: AST, increment: AST, block: Block):
         self.init = init
         self.condition = condition
@@ -153,6 +158,7 @@ class WhileLoop(AST):
         condition (AST): keeps running the loop while `condition` is true.
         block (Block): code to loop through.
     """
+
     def __init__(self, condition: AST, block: Block):
         self.condition = condition
         self.block = block
@@ -166,6 +172,7 @@ class DoWhile(AST):
         condition (AST): keeps running the loop while `condition` is true.
         block (Block): code to loop through.
     """
+
     def __init__(self, condition: AST, block: Block):
         self.condition = condition
         self.block = block
@@ -184,11 +191,13 @@ class FunctionDeclaration(AST):
         args (list[FunctionArgument]): arguments that the function will take.
         body (Block): main body of the function.
     """
+
     def __init__(self, type: TokenType, name: Variable, args: list, body: Block):
         self.type = type
         self.name = name
         self.args = args
         self.body = body
+
 
 class FunctionCall(AST):
     """
@@ -199,15 +208,43 @@ class FunctionCall(AST):
         args (list[FunctionArgument]): arguments to put into the function.
         token (Token): the token that is printed when an error is thrown.
     """
-    def __init__(self, name: str, args: list, token: Token=None):
+
+    def __init__(self, name: str, args: list, token: Token = None):
         self.name = name
         self.args = args
         self.token = token
 
 
-class BuiltinFunction(AST): # comment this later
+class BuiltinFunction(AST):  # comment this later
     def __init__(self, name):
         self.name = name
+
+
+class BreakStatement(AST):
+    """Node the represents a break statement."""
+
+    def __init__(self, token=None):
+        self.token = token
+
+
+class ContinueStatement(AST):
+    """Node the represents a continue statement."""
+
+    def __init__(self, token=None):
+        self.token = token
+
+
+class ReturnStatement(AST):
+    """
+    Node that represents a return statement.
+
+    Attributes:
+        expression (AST): the expression to return.
+    """
+
+    def __init__(self, expression: AST, token=None):
+        self.expression = expression
+        self.token = token
 
 
 class Program(AST):
@@ -217,6 +254,10 @@ class Program(AST):
     Attributes:
         functions (list[FunctionDeclaration]): list of functions in the program.
     """
+
     def __init__(self, functions: list):
         self.functions = functions
 
+
+class NoOperation(AST):
+    pass

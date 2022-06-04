@@ -1,7 +1,16 @@
 class DictNode(object):
+    """
+    Class the represents a node in LinkedDict.
+
+    Attributes:
+        hmap (dict): data that is being held by the node.
+        prev (DictNode): the next node / next highest scope.
+    """
+
     def __init__(self, prev):
-        self.dict = {}
+        self.hmap = {}
         self.prev = prev
+
 
 class LinkedDict(object):
     """
@@ -13,6 +22,7 @@ class LinkedDict(object):
         top (DictNode): the node at the top of the stack.
         bottom (DictNode): the node at the bottom of the stack.
     """
+
     def __init__(self):
         """Inits LinkedDict class."""
         self.top = DictNode(DictNode(None))
@@ -30,13 +40,13 @@ class LinkedDict(object):
             KeyError: if the provided key is not present.
         """
         # Begins with the lowest scope.
-        curr = self.top 
+        curr = self.top
 
         # Keeps looping until you reach the highest scope.
         while curr.prev != None:
             # If the key is present in the scope, return the corresponding value.
-            if key in curr.dict:
-                return curr.dict[key]
+            if key in curr.hmap:
+                return curr.hmap[key]
 
             # Otherwise, go to the next highest scope.
             curr = curr.prev
@@ -60,8 +70,8 @@ class LinkedDict(object):
         # Keeps looping until you reach the highest scope.
         while curr.prev != None:
             # If the key is present in the scope, set the corresponding value and return.
-            if key in curr.dict:
-                curr.dict[key] = value
+            if key in curr.hmap:
+                curr.hmap[key] = value
                 return
 
             # Otherwise, go to the next highest scope.
@@ -80,11 +90,11 @@ class LinkedDict(object):
             Exception: if the provided key is already present in the lowest scope.
         """
         # Throw an exception if the key is already present.
-        if key in self.top.dict:
+        if key in self.top.hmap:
             raise Exception(f"{str(key)} in dict")
 
         # Otherwise insert it into the hashmap.
-        self.top.dict[key] = value
+        self.top.hmap[key] = value
 
     def push(self) -> None:
         """Creates a scope beneath the currently lowest scope."""
@@ -96,7 +106,7 @@ class LinkedDict(object):
 
     def peek(self) -> dict:
         """Returns a dict of the lowest scope."""
-        return self.top.dict
+        return self.top.hmap
 
     def __contains__(self, key) -> bool:
         """Checks if a value is present in the data structure."""
@@ -106,7 +116,7 @@ class LinkedDict(object):
         # Keeps looping until you reach the highest scope.
         while curr.prev != None:
             # If the key is present in the scope, return True.
-            if key in curr.dict:
+            if key in curr.hmap:
                 return True
 
             # Otherwise go to the next highest scope.
@@ -126,7 +136,7 @@ class LinkedDict(object):
         # Keeps looping until you reach the highest scope.
         while curr.prev != None:
             # Append the current scope to the list.
-            l.append(curr.dict)
+            l.append(curr.hmap)
 
             # Otherwise go to the next highest scope.
             curr = curr.prev
@@ -136,6 +146,3 @@ class LinkedDict(object):
 
         # Return a string representation of the list.
         return str(l)
-
-    __repr__ = __str__
-        

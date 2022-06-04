@@ -7,6 +7,7 @@ class ErrorCode(Enum):
     DUPLICATE_ID = "Duplicate id found"
     MISMATCHED_TYPE = "Mismatched type"
     MISMATCHED_ARGS = "Mismatched arguments"
+    BREAK_OR_CONTINUE_WITHOUT_LOOP = "Break or continue without loop"
 
 
 class LexerError(Exception):
@@ -23,3 +24,19 @@ class SemanticError(Exception):
 
 class FileError(Exception):
     pass
+
+
+class BreakException(Exception):
+    def __init__(self, token):
+        self.token = token
+
+
+class ContinueException(Exception):
+    def __init__(self, token):
+        self.token = token
+
+
+class ReturnException(Exception):
+    def __init__(self, value, token=None):
+        self.value = value
+        self.token = token
