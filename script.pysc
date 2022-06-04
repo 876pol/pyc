@@ -6,6 +6,7 @@ int gcd(int a, int b) {
     }
 }
 
+
 void main() {
     printi(gcd(inputi(), inputi()));
 }
