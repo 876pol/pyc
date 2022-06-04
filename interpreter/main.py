@@ -5,6 +5,7 @@ from parser import Parser
 from interpreter import Interpreter
 from error import FileError
 
+
 # Main function
 def main():
     # Check if the user provided a source file.

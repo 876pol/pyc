@@ -4,3 +4,4 @@ interpreter/__pycache__
 .vscode
 poetry.lock
 pyproject.toml
+.breakpoints

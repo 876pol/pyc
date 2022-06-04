@@ -1,5 +1,6 @@
 from error import LexerError
-from token import RESERVED_KEYWORDS, SYMBOLS, Token, TokenType 
+from tokens import RESERVED_KEYWORDS, SYMBOLS, Token, TokenType
+
 
 class Lexer(object):
     """
@@ -125,7 +126,7 @@ class Lexer(object):
 
         # Return the string token.
         return Token(TokenType.STRING, result, line=self.line, column=self.column)
-        
+
     def get_variable(self) -> Token:
         """
         Return a variable or keyword consumed from the input.
@@ -169,7 +170,7 @@ class Lexer(object):
             return Token(SYMBOLS[s], s, line=self.line, column=self.column)
 
         # Throw an error is no symbol is found.
-        self.error()        
+        self.error()
 
     def get_next_token(self) -> Token:
         """
@@ -216,4 +217,5 @@ class Lexer(object):
 
     def error(self) -> None:
         """Throws an error and states the current character, line, and column on which the error happened"""
-        raise LexerError(f"Lexer error on '{self.current_char}' -> position={self.line}:{self.column}")
+        raise LexerError(
+            f"Lexer error on '{self.current_char}' -> position={self.line}:{self.column}")

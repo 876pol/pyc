@@ -1,11 +1,16 @@
-function gcd(int a, int b) {
+int gcd(int a, int b) {
     if (a == 0) {
-        printi(b);
+        return b;
     } else {
-        gcd(b % a, a);
+        return gcd(b % a, a);
     }
 }
 
-function main() {
-    gcd(1024, 64);
+int test() {
+    return 1;
+}
+
+void main() {
+    test();
+    printi(inputi());
 }

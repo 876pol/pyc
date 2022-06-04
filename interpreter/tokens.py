@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Token(object):
     """
     Class that represents a token.
@@ -32,7 +33,7 @@ class Token(object):
     __repr__ = __str__
 
 
-# Dictionary containing all special symbols and characters. These identifiers 
+# Dictionary containing all special symbols and characters. These identifiers
 # and keywords will be added to the TokenType enum class.
 SYMBOL = {"PLUS": "+",
           "MINUS": "-",
@@ -71,31 +72,35 @@ SYMBOL = {"PLUS": "+",
           "RCPAR": "}",
           "SEMI": ";",
           "COMMA": ",",
-         }
+          }
 
-# Dictionary that maps token identifiers to keywords. These identifiers 
+# Dictionary that maps token identifiers to keywords. These identifiers
 # and keywords will be added to the TokenType enum class.
 KEYWORD = {"INTC": "int",
            "FLOATC": "float",
            "STRING": "string",
-           "FUNCTION": "function",
+           "VOID": "void",
            "IF": "if",
            "ELSE": "else",
            "FOR": "for",
            "WHILE": "while",
-           "DO": "do"
-          }
+           "DO": "do",
+           "BREAK": "break",
+           "CONTINUE": "continue",
+           "RETURN": "return",
+           }
 
-# Dictionary that maps token identifiers to miscellaneous symbols. These identifiers 
+# Dictionary that maps token identifiers to miscellaneous symbols. These identifiers
 # and miscellaneous symbols will be added to the TokenType enum class.
 OTHER = {"EOF": "EOF",
          "TYPE": "TYPE",
-        }
+         }
 
 
 class TokenType(Enum):
     """Enum class that contains all the different types of tokens."""
     pass
+
 
 # Add all the entries from the SYMBOL, KEYWORD, and OTHER dictionaries into the TokenType enum.
 for k, v in SYMBOL.items():
