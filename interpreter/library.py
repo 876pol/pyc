@@ -1,20 +1,34 @@
 from ast import FunctionArgument
 from tokens import Token, TokenType
-from type import bv
-from error import BreakException, ContinueException, ReturnException
+from type import build_value
+from error import ReturnException
+import sys
 
 
 class LibraryFunction(object):
+    """
+    Class that represents a builtin function.
+
+    Attributes:
+        type (TokenType): the return type of the function.
+        args (list[FunctionArgument]): the function arguments.
+    """
     type = None
     args = None
 
     def run(scopes):
+        """The function body."""
         pass
+
+
+"""
+The next three classes are for adding functions to print ints, floats, and strings.
+"""
 
 
 class printi(LibraryFunction):
     type = TokenType.VOID
-    args = [FunctionArgument(TokenType.INTC, Token(TokenType.TYPE, "p"))]
+    args = [FunctionArgument(TokenType.INT, Token(TokenType.TYPE, "p"))]
 
     def run(scopes):
         print(scopes.get("p").value)
@@ -22,7 +36,7 @@ class printi(LibraryFunction):
 
 class printf(LibraryFunction):
     type = TokenType.VOID
-    args = [FunctionArgument(TokenType.FLOATC, Token(TokenType.TYPE, "p"))]
+    args = [FunctionArgument(TokenType.FLOAT, Token(TokenType.TYPE, "p"))]
 
     def run(scopes):
         print(scopes.get("p").value)
@@ -36,36 +50,52 @@ class prints(LibraryFunction):
         print(scopes.get("p").value)
 
 
-class InputTokenizer:
-    def __init__(self):
-        self.tokens = []
-        self.curr_ind = 0
+def next():
+    """Reads a token from stdin."""
+    token = ""
+    while True:
+        c = sys.stdin.read(1)
+        if not c.isspace():
+            token += c
+            break
+    while True:
+        c = sys.stdin.read(1)
+        if c.isspace():
+            break
+        token += c
+    return token
 
-    def next(self):
-        while self.curr_ind >= len(self.tokens):
-            self.curr_ind = 0
-            self.tokens = input().split()
-        self.curr_ind += 1
-        return self.tokens[self.curr_ind - 1]
+
+def next_line():
+    """Reads up to the next newline in stdin."""
+    line = ""
+    while True:
+        c = sys.stdin.read(1)
+        if c == "\n":
+            break
+        line += c
+    return line
 
 
-tokenizer = InputTokenizer()
+"""
+The next four classes are for adding functions to take ints, floats, and strings as input.
+"""
 
 
 class inputi(LibraryFunction):
-    type = TokenType.INTC
+    type = TokenType.INT
     args = []
 
     def run(scopes):
-        raise ReturnException(bv(TokenType.INTC, int(tokenizer.next())))
+        raise ReturnException(build_value(TokenType.INT, int(next())))
 
 
 class inputf(LibraryFunction):
-    type = TokenType.FLOATC
+    type = TokenType.FLOAT
     args = []
 
     def run(scopes):
-        raise ReturnException(bv(TokenType.FLOATC, float(tokenizer.next())))
+        raise ReturnException(build_value(TokenType.FLOAT, float(next())))
 
 
 class inputs(LibraryFunction):
@@ -73,9 +103,18 @@ class inputs(LibraryFunction):
     args = []
 
     def run(scopes):
-        raise ReturnException(bv(TokenType.STRING, tokenizer.next()))
+        raise ReturnException(build_value(TokenType.STRING, next()))
 
 
+class inputl(LibraryFunction):
+    type = TokenType.STRING
+    args = []
+
+    def run(scopes):
+        raise ReturnException(build_value(TokenType.STRING, next_line()))
+
+
+# Add all functions defined earlier into a dictionary.
 LIBRARY_FUNCTIONS = {
     func.__name__: func
     for func in LibraryFunction.__subclasses__()

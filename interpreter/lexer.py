@@ -100,10 +100,10 @@ class Lexer(object):
                 self.advance()
 
             # Return the float token.
-            return Token(TokenType.FLOATC, float(result), line=self.line, column=self.column)
+            return Token(TokenType.FLOAT, float(result), line=self.line, column=self.column)
         else:
             # Return the int token.
-            return Token(TokenType.INTC, int(result), line=self.line, column=self.column)
+            return Token(TokenType.INT, int(result), line=self.line, column=self.column)
 
     def get_string(self) -> Token:
         """

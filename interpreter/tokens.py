@@ -76,8 +76,8 @@ SYMBOL = {"PLUS": "+",
 
 # Dictionary that maps token identifiers to keywords. These identifiers
 # and keywords will be added to the TokenType enum class.
-KEYWORD = {"INTC": "int",
-           "FLOATC": "float",
+KEYWORD = {"INT": "int",
+           "FLOAT": "float",
            "STRING": "string",
            "VOID": "void",
            "IF": "if",

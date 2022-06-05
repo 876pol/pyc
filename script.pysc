@@ -7,6 +7,7 @@ int gcd(int a, int b) {
 }
 
 
-void main() {
-    printi(gcd(inputi(), inputi()));
+int main() {
+    printi((string) gcd(inputi(), inputi()));
+    return 0;
 }

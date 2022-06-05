@@ -40,6 +40,22 @@ class BinaryOperator(AST):
         self.token = token
 
 
+class CastOperator(AST):
+    """
+    Node that represents a cast operator.
+
+    Attributes:
+        operator (TokenType): the operator.
+        expression (AST): expression that returns a value.
+        token (Token): the token that is printed when an error is thrown.
+    """
+
+    def __init__(self, operator: TokenType, expression: AST, token: Token = None):
+        self.operator = operator
+        self.expression = expression
+        self.token = token
+
+
 class Val(AST):
     """
     Node that represents a value (int, float, or string literal).
@@ -106,7 +122,7 @@ class AssignmentStatement(AST):
 
 class Block(AST):
     """
-    Node that represents a block ({ code }).
+    Node that represents a block of code.
 
     Attributes:
         children (list[AST]): list of AST nodes to run.
@@ -215,22 +231,39 @@ class FunctionCall(AST):
         self.token = token
 
 
-class BuiltinFunction(AST):  # comment this later
-    def __init__(self, name):
+class BuiltinFunction(AST):
+    """
+    Node that represents a builtin function.
+
+    Attributes:
+        name (str): the name of the function.
+    """
+
+    def __init__(self, name: str):
         self.name = name
 
 
 class BreakStatement(AST):
-    """Node the represents a break statement."""
+    """
+    Node the represents a break statement.
 
-    def __init__(self, token=None):
+    Attributes:
+        token (Token): the "break" token, used when printing error messages.
+    """
+
+    def __init__(self, token: Token = None):
         self.token = token
 
 
 class ContinueStatement(AST):
-    """Node the represents a continue statement."""
+    """
+    Node the represents a continue statement.
 
-    def __init__(self, token=None):
+    Attributes:
+        token (Token): the "continue" token, used when printing error messages.
+    """
+
+    def __init__(self, token: Token = None):
         self.token = token
 
 
@@ -240,9 +273,10 @@ class ReturnStatement(AST):
 
     Attributes:
         expression (AST): the expression to return.
+        token (Token): the "return" token, used when printing error messages.
     """
 
-    def __init__(self, expression: AST, token=None):
+    def __init__(self, expression: AST, token: Token = None):
         self.expression = expression
         self.token = token
 
@@ -260,4 +294,5 @@ class Program(AST):
 
 
 class NoOperation(AST):
+    """Node that does nothing."""
     pass

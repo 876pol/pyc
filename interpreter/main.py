@@ -27,7 +27,7 @@ def main():
     lexer = Lexer(code)
     parser = Parser(lexer)
     interpreter = Interpreter(parser)
-    interpreter.interpret()
+    exit(interpreter.interpret())
 
 
 if __name__ == "__main__":
