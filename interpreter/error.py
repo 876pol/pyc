@@ -1,4 +1,5 @@
 from enum import Enum
+
 from tokens import Token
 from type import Value
 

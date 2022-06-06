@@ -1,8 +1,9 @@
+import sys
+
 from ast import FunctionArgument
+from error import ReturnException
 from tokens import Token, TokenType
 from type import build_value
-from error import ReturnException
-import sys
 
 
 class LibraryFunction(object):

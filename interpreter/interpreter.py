@@ -1,12 +1,10 @@
-from tokens import Token
+from ast import BuiltinFunction, AST, FunctionCall
 from lexer import TokenType
-from ast import BuiltinFunction, AST
 from error import InterpreterError, ErrorCode, BreakException, ContinueException, ReturnException
 from library import LIBRARY_FUNCTIONS
 from linked_dict import LinkedDict
 from parser import Parser
 from type import Value, build_value, Function
-from ast import FunctionCall
 
 
 class Interpreter(object):

@@ -1,33 +1,34 @@
-from os import listdir, getcwd
-from sys import argv
+import os
+import sys
+
+from error import FileError
+from interpreter import Interpreter
 from lexer import Lexer
 from parser import Parser
-from interpreter import Interpreter
-from error import FileError
 
 
 # Main function
 def main():
     # Check if the user provided a source file.
-    if len(argv) <= 1:
+    if len(sys.argv) <= 1:
         raise FileError("No source file provided")
 
     # Check if the provided source files exists.
-    cwd = getcwd()
-    dir_files = listdir(cwd)
-    if argv[1] not in dir_files:
+    cwd = os.getcwd()
+    dir_files = os.listdir(cwd)
+    if sys.argv[1] not in dir_files:
         raise FileError("No source file found")
-        return
 
     # Read the source code into a variable.
-    file = open(argv[1], "r")
+    file = open(sys.argv[1], "r")
     code = file.read()
 
     # Starts the interpreter.
     lexer = Lexer(code)
     parser = Parser(lexer)
     interpreter = Interpreter(parser)
-    exit(interpreter.interpret())
+    exit_code = interpreter.interpret()
+    exit(exit_code)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,7 @@
-from tokenize import Token
+import ast
+from error import ErrorCode, ParserError
 from lexer import Lexer
 from tokens import TokenType
-from error import ParserError, ErrorCode
-import ast
 
 
 class Parser(object):

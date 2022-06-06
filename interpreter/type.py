@@ -14,6 +14,9 @@ class Value(object):
         self.type = type
         self.value = value
 
+    def __str__(self) -> str:
+        return f"({self.type}, {self.value})"
+
 
 def build_value(type: TokenType, value) -> Value:
     """

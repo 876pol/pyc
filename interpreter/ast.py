@@ -1,5 +1,6 @@
-from tokens import Token, TokenType
 from collections import namedtuple
+
+from tokens import Token, TokenType
 
 
 class AST(object):
