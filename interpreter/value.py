@@ -87,6 +87,7 @@ def identifier_to_normal(obj: TokenType) -> TokenType:
 
 """The next four class are subclasses of `Value`. They define all the operations that these types can perform."""
 
+
 class Int(Value):
     def binary_operator(self, operator, obj):
         operations = {
@@ -291,6 +292,7 @@ class Function(object):
         args (list): the list of args.
         block (AST): the main body of the function.
     """
+
     def __init__(self, type: TokenType, args: list, block: AST):
         self.type = type
         self.args = args
