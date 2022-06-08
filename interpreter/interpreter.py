@@ -1,10 +1,16 @@
+"""
+ICS3U
+Paul Chen
+This file holds the `Interpreter` class that runs an abstract syntax tree.
+"""
+
 from ast import BuiltinFunction, AST, FunctionCall
 from lexer import TokenType
-from error import InterpreterError, ErrorCode, BreakException, ContinueException, ReturnException
+from error import BreakException, ContinueException, ErrorCode, InterpreterError, ReturnException
 from library import LIBRARY_FUNCTIONS
 from linked_dict import LinkedDict
 from parser import Parser
-from type import Value, build_value, Function
+from value import build_value, normal_to_identifier, Function, identifier_to_normal, Value
 
 
 class Interpreter(object):
@@ -82,8 +88,8 @@ class Interpreter(object):
         """Visits a BinaryOperator node."""
         l = self.visit(node.expr_left)
         r = self.visit(node.expr_right)
-        value = l.binary_operator(node.operator, r)
 
+        value = l.binary_operator(node.operator, r)
         # Throws an error if the operation does not exist for the two variable types. Ex. 2 / "a".
         if value is None:
             self.error(ErrorCode.MISMATCHED_TYPE, node.token)
@@ -105,12 +111,58 @@ class Interpreter(object):
         """Visits a Val node."""
         return build_value(node.type, node.value)
 
+    def visit_ListVal(self, node):
+        """Visits a ListVal node."""
+        l = []
+        for expr in node.value:
+            l.append(self.visit(expr))
+        return build_value(TokenType.LISTL, l)
+
+    def visit_ListRead(self, node):
+        """Visits a ListRead node."""
+        index = self.visit(node.expr_index)
+        list_obj = self.visit(node.obj)
+        if index.type != TokenType.INTL:
+            self.error(ErrorCode.MISMATCHED_TYPE, None)
+        return list_obj.value[index.value]
+
+    def visit_ListAssign(self, node):
+        """Visits a ListAssign node."""
+        indicies = [self.visit(e) for e in node.expr_index]
+        list_obj = self.visit(node.obj)
+        expression = self.visit(node.expression)
+
+        # Checks if all the indicies to access are ints.
+        if any(e.type != TokenType.INTL for e in indicies):
+            self.error(ErrorCode.MISMATCHED_TYPE, None)
+
+        # Sets `curr` as the 1-D list if the whole list is multidimensional.
+        curr = list_obj.value
+        for i in range(len(indicies) - 1):
+            curr = curr[indicies[i].value].value
+
+        # Runs if node.operator is a simple assignment operator.
+        if node.operator == TokenType.ASSIGN:
+            # Set the variable to the new value.
+            curr[indicies[-1].value] = expression
+        # Runs if node.operator is any other type of assignment operator. Ex. +=, -=...
+        else:
+            # Gets the variable and applies the operation.
+            value = curr[indicies[-1].value].assignment_operator(
+                node.operator, expression)
+
+            # Throws an error if the operation is not defined.
+            if value is None:
+                self.error(ErrorCode.MISMATCHED_TYPE, node.token)
+
+            # Sets the variable to the new value.
+            curr[indicies.value] = value()
+
     def visit_Variable(self, node):
         """Visits a Variable node."""
         # Throw an error if the variable has not been declared.
         if node.value not in self.scopes:
             self.error(ErrorCode.ID_NOT_FOUND, node.token)
-
         # Otherwise return the value of the variable.
         else:
             return self.scopes.get(node.value)
@@ -124,7 +176,8 @@ class Interpreter(object):
             self.error(ErrorCode.DUPLICATE_ID, node.name.token)
 
         # Add the variable into the current scope.
-        self.scopes.insert(node.name.value, build_value(node.type, val.value))
+        self.scopes.insert(node.name.value, build_value(
+            identifier_to_normal(node.type), val.value))
 
     def visit_AssignmentStatement(self, node):
         """Visits an AssignmentStatement node."""
@@ -266,7 +319,7 @@ class Interpreter(object):
         if len(function.args) != len(node.args):
             self.error(ErrorCode.MISMATCHED_ARGS, node.token)
         for i in range(len(function.args)):
-            if ret[i].type != function.args[i].type:
+            if normal_to_identifier(ret[i].type) != function.args[i].type:
                 self.error(ErrorCode.MISMATCHED_ARGS, node.token)
             self.scopes.insert(function.args[i].name.value, ret[i])
 
@@ -290,9 +343,9 @@ class Interpreter(object):
         self.scopes.top = top
 
         # If the function type and the return type line up, return the return value.
-        if (ret_val == None and function.type == TokenType.VOID) or (ret_val != None and ret_val.type == function.type):
+        if (ret_val == None and function.type == TokenType.VOID) or \
+                (ret_val != None and normal_to_identifier(ret_val.type) == function.type):
             return ret_val
-
         # Otherwise throw an error.
         else:
             self.error(ErrorCode.MISMATCHED_TYPE, ret_token)

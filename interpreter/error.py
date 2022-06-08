@@ -1,7 +1,14 @@
+"""
+ICS3U
+Paul Chen
+This files holds the code for all custom errors and exceptions
+that are used in the interpreter.
+"""
+
 from enum import Enum
 
 from tokens import Token
-from type import Value
+from value import Value
 
 
 class ErrorCode(Enum):
@@ -13,7 +20,7 @@ class ErrorCode(Enum):
     MISMATCHED_ARGS = "Mismatched arguments"
     BREAK_OR_CONTINUE_WITHOUT_LOOP = "Break or continue without loop"
     INVALID_MAIN = "Invalid main function"
-
+    OUT_OF_BOUNDS = "Out of bounds"
 
 class LexerError(Exception):
     """Error that occurs in the lexer."""
@@ -29,10 +36,6 @@ class InterpreterError(Exception):
     """Error that occurs in the interpreter."""
     pass
 
-
-class FileError(Exception):
-    """Error that occurs while reading the source code file."""
-    pass
 
 
 """

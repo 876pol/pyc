@@ -1,7 +1,11 @@
-import os
+"""
+ICS3U
+Paul Chen
+This file is the main entry point into the program.
+"""
+
 import sys
 
-from error import FileError
 from interpreter import Interpreter
 from lexer import Lexer
 from parser import Parser
@@ -11,13 +15,7 @@ from parser import Parser
 def main():
     # Check if the user provided a source file.
     if len(sys.argv) <= 1:
-        raise FileError("No source file provided")
-
-    # Check if the provided source files exists.
-    cwd = os.getcwd()
-    dir_files = os.listdir(cwd)
-    if sys.argv[1] not in dir_files:
-        raise FileError("No source file found")
+        raise FileNotFoundError("No source file provided")
 
     # Read the source code into a variable.
     file = open(sys.argv[1], "r")

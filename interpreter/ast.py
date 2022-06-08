@@ -1,3 +1,10 @@
+"""
+ICS3U
+Paul Chen
+This file holds the code for an abstract syntax tree that the 
+code will be parsed into.
+"""
+
 from collections import namedtuple
 
 from tokens import Token, TokenType
@@ -69,6 +76,51 @@ class Val(AST):
     def __init__(self, token: Token):
         self.type = token.type
         self.value = token.value
+
+
+class ListVal(AST):
+    """
+    Node that represents a list.
+
+    Attributes:
+        value (list): the list object held by this node.
+    """
+
+    def __init__(self, value: list):
+        self.value = value
+
+
+class ListRead(AST):
+    """
+    Node that represents a list read operation.
+
+    Attributes:
+        obj (AST): the list object to read.
+        expr_index (int): the expression giving the index of the list to read.
+    """
+
+    def __init__(self, obj: AST, expr_index: int):
+        self.obj = obj
+        self.expr_index = expr_index
+
+
+class ListAssign(AST):
+    """
+    Node that represents a list assignment operation.
+
+    Attributes:
+        obj (AST): the list object to assign.
+        expr_index (list): the expression giving the indicies of the list to assign.
+        operator (TokenType): the assignment operator.
+        expression (AST): the value to assign.
+        token (Token): the token that is printed when an error is thrown.
+    """
+
+    def __init__(self, obj: AST, expr_index: list, operator: TokenType, expression: AST, token: Token = None):
+        self.obj = obj
+        self.expr_index = expr_index
+        self.operator = operator
+        self.expression = expression
 
 
 class Variable(AST):

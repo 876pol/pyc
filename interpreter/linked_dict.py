@@ -1,3 +1,11 @@
+"""
+ICS3U
+Paul Chen
+This files holds the code for a "Linked Hash Map", which is a linked-list / tree
+each node holds a hash map. This data structure is used to hold all the variables
+and functions that the interpreter encounters.
+"""
+
 class DictNode(object):
     """
     Class the represents a node in LinkedDict.

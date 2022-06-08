@@ -1,0 +1,77 @@
+/*
+    Tic-Tac-Toe game written in pyc.
+*/
+
+// Function that prints the Tic-Tac-Toe grid.
+void print_grid(list grid) {
+    for (int i = 0; i < 3; i += 1) {
+        string to_print = "|";
+        for (int j = 0; j < 3; j += 1) {
+            to_print += (string) grid[i][j] + "|";
+        }
+        prints(to_print);
+    }
+}
+
+// Function that checks if a player has won.
+int gameover(list grid) {
+    for (int i = 0; i < 3; i += 1) {
+        if ((grid[i][0] == grid[i][1] && grid[i][1] == grid[i][2] && grid[i][0] != " ") || 
+            (grid[0][i] == grid[1][i] && grid[1][i] == grid[2][i] && grid[0][i] != " ")) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int main() {
+    list grid = [[" ", " ", " "], // Tic-Tac-Toe board.
+                [" ", " ", " "], 
+                [" ", " ", " "]];
+    int turn = 1; // The current player's turn.
+
+    for (int i = 0; i < 9; i += 1) {
+        // Prints messages
+        print_grid(grid);
+        prints("It is Player " + (string) turn + "'s turn");
+        prints("Where do you want to place your token? Type a number from 1 to 9.");
+
+        // Gets user input and validates it.
+        int is_valid = 1;
+        int choice = 0;
+        do {
+            is_valid = 1;
+            choice = inputi() - 1;
+            if (choice < 0 || choice > 8) {
+                is_valid = 0;
+                prints("Invalid Input.");
+            } else if (grid[choice / 3][choice % 3] != " ") {
+                is_valid = 0;
+                prints("Invalid Input.");
+            }
+        } while (!is_valid);
+
+        // Sets the game board based on the player's move.
+        if (turn == 1) {
+            grid[choice / 3][choice % 3] = "O";
+        } else {
+            grid[choice / 3][choice % 3] = "X";
+        }
+
+        // Check if the player has won.
+        if (gameover(grid)) {
+            print_grid(grid);
+            prints("Player " + (string) turn + " wins!");
+            return 0;
+        }
+
+        // Change turn.
+        turn = !(turn - 1) + 1;
+    }
+
+    // If no one has won after nine moves, the game has tied.
+    print_grid(grid);
+    prints("Tie!");
+
+    return 0;
+}

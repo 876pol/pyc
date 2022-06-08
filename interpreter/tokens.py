@@ -1,3 +1,9 @@
+"""
+ICS3U
+Paul Chen
+This file creates the `Token` class and declares all tokens and keywords used by the interpreter.
+"""
+
 from enum import Enum
 
 
@@ -68,6 +74,8 @@ SYMBOL = {"PLUS": "+",
           "BIT_RSHIFT_ASSIGN": ">>=",
           "LRPAR": "(",
           "RRPAR": ")",
+          "LSPAR": "[",
+          "RSPAR": "]",
           "LCPAR": "{",
           "RCPAR": "}",
           "SEMI": ";",
@@ -79,6 +87,7 @@ SYMBOL = {"PLUS": "+",
 KEYWORD = {"INT": "int",
            "FLOAT": "float",
            "STRING": "string",
+           "LIST": "list",
            "VOID": "void",
            "IF": "if",
            "ELSE": "else",
@@ -94,6 +103,11 @@ KEYWORD = {"INT": "int",
 # and miscellaneous symbols will be added to the TokenType enum class.
 OTHER = {"EOF": "EOF",
          "TYPE": "TYPE",
+         # The difference between INT and INTL is that INT is the keyword "int", while INTL represents an int object.
+         "INTL": "INTL",
+         "FLOATL": "FLOATL",
+         "STRINGL": "STRINGL",
+         "LISTL": "LISTL",
          }
 
 

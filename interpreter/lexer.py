@@ -1,3 +1,9 @@
+"""
+ICS3U
+Paul Chen
+This file holds the `Lexer` class that converts the code into tokens.
+"""
+
 from error import LexerError
 from tokens import RESERVED_KEYWORDS, SYMBOLS, Token, TokenType
 
@@ -100,10 +106,10 @@ class Lexer(object):
                 self.advance()
 
             # Return the float token.
-            return Token(TokenType.FLOAT, float(result), line=self.line, column=self.column)
+            return Token(TokenType.FLOATL, float(result), line=self.line, column=self.column)
         else:
             # Return the int token.
-            return Token(TokenType.INT, int(result), line=self.line, column=self.column)
+            return Token(TokenType.INTL, int(result), line=self.line, column=self.column)
 
     def get_string(self) -> Token:
         """
@@ -125,7 +131,7 @@ class Lexer(object):
             self.advance()
 
         # Return the string token.
-        return Token(TokenType.STRING, result, line=self.line, column=self.column)
+        return Token(TokenType.STRINGL, result, line=self.line, column=self.column)
 
     def get_variable(self) -> Token:
         """
@@ -135,7 +141,7 @@ class Lexer(object):
         """
         # Keeps reading alphanumberical characters into a string.
         result = ""
-        while self.current_char is not None and self.current_char.isalnum():
+        while self.current_char is not None and (self.current_char.isalnum() or self.current_char == "_"):
             result += self.current_char
             self.advance()
 
@@ -206,7 +212,7 @@ class Lexer(object):
                 return self.get_number()
 
             # If the current character is a letter, return a type or keyword token.
-            if self.current_char.isalpha():
+            if self.current_char.isalpha() or self.current_char == "_":
                 return self.get_variable()
 
             # Return a symbol.
