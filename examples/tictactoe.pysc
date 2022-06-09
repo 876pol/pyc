@@ -24,6 +24,7 @@ int gameover(list grid) {
     return 0;
 }
 
+// Main function.
 int main() {
     list grid = [[" ", " ", " "], // Tic-Tac-Toe board.
                 [" ", " ", " "], 

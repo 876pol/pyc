@@ -1,0 +1,11 @@
+int main() {
+    int a = inputi();
+    if (a < 5) {
+        prints("a is less than 5");
+    } else if (a < 10) {
+        prints("a is less than 10");
+    } else {
+        prints("a is not less than 10");
+    }
+    return 0;
+}

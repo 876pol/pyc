@@ -253,17 +253,22 @@ class String(Value):
 
 
 class List(Value):
-    def add_element_return(self, obj):
+    """
+    The list type is fairly limited. Similar to C arrays, there is no method to get the length of a list, or decrease 
+    the size of the list. However, this list can store any data type / multiple different data types, but new elements
+    can be appended to the list.
+    """
+    def add_element_and_return(self, obj):
         ret_val = list(self.value)
         ret_val.append(obj)
         return ret_val
 
     def binary_operator(self, operator, obj):
         operations = {
-            (TokenType.PLUS, TokenType.INTL): lambda: build_value(TokenType.LISTL, self.add_element_return(obj)),
-            (TokenType.PLUS, TokenType.FLOATL): lambda: build_value(TokenType.LISTL, self.add_element_return(obj)),
-            (TokenType.PLUS, TokenType.STRINGL): lambda: build_value(TokenType.LISTL, self.add_element_return(obj)),
-            (TokenType.PLUS, TokenType.LISTL): lambda: build_value(TokenType.LISTL, self.add_element_return(obj)),
+            (TokenType.PLUS, TokenType.INTL): lambda: build_value(TokenType.LISTL, self.add_element_and_return(obj)),
+            (TokenType.PLUS, TokenType.FLOATL): lambda: build_value(TokenType.LISTL, self.add_element_and_return(obj)),
+            (TokenType.PLUS, TokenType.STRINGL): lambda: build_value(TokenType.LISTL, self.add_element_and_return(obj)),
+            (TokenType.PLUS, TokenType.LISTL): lambda: build_value(TokenType.LISTL, self.add_element_and_return(obj)),
             (TokenType.EQUAL, TokenType.LISTL): lambda: build_value(TokenType.INTL, bool(self.value == obj.value)),
             (TokenType.NOT_EQUAL, TokenType.LISTL): lambda: build_value(TokenType.INTL, bool(self.value != obj.value)),
         }
@@ -275,10 +280,10 @@ class List(Value):
 
     def assignment_operator(self, operator, obj):
         operations = {
-            (TokenType.PLUS_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.LISTL, self.add_element_return(obj)),
-            (TokenType.PLUS_ASSIGN, TokenType.FLOATL): lambda: build_value(TokenType.LISTL, self.add_element_return(obj)),
-            (TokenType.PLUS_ASSIGN, TokenType.STRINGL): lambda: build_value(TokenType.LISTL, self.add_element_return(obj)),
-            (TokenType.PLUS_ASSIGN, TokenType.LISTL): lambda: build_value(TokenType.LISTL, self.add_element_return(obj)),
+            (TokenType.PLUS_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.LISTL, self.add_element_and_return(obj)),
+            (TokenType.PLUS_ASSIGN, TokenType.FLOATL): lambda: build_value(TokenType.LISTL, self.add_element_and_return(obj)),
+            (TokenType.PLUS_ASSIGN, TokenType.STRINGL): lambda: build_value(TokenType.LISTL, self.add_element_and_return(obj)),
+            (TokenType.PLUS_ASSIGN, TokenType.LISTL): lambda: build_value(TokenType.LISTL, self.add_element_and_return(obj)),
         }
         return operations.get((operator, obj.type), None)
 

@@ -1,0 +1,11 @@
+int main() {
+    for (int i = 0; i < 5; i += 1) {
+        printi(i);   
+    }
+    int i = 4;
+    while (i >= 0) {
+        printi(i);
+        i -= 1;
+    }
+    return 0;
+}

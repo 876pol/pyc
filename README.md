@@ -12,6 +12,8 @@ cd pyc
 python interpreter/main.py examples/hello_world.pysc
 ```
 
+More sample programs can be  found in `/example`.
+
 ## References
 
 <https://ruslanspivak.com/> (Learning about interpreters)
