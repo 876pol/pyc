@@ -2,9 +2,21 @@
 
 Interpreted C-like programming language written with Python 3. Created as my ICS3U (Grade 11 Computer Science) final.
 
+## Features
+
+- Initializing variables
+
+- Evaluating expressions
+
+- Control Structures
+
+- Functions
+
+- C-like syntax
+
 ## Installation
 
-To clone this repository and run a basic program:
+To clone this repository and run a program:
 
 ```bash
 git clone https://github.com/876pol/pyc.git
@@ -12,7 +24,23 @@ cd pyc
 python pyc examples/hello_world.pysc
 ```
 
-More sample programs can be  found in `/example`.
+More sample programs can be found in `/example`.
+
+## Known Bugs / Limitations
+
+- Many error messages aren't clear.
+
+- Lists are fairly limited.
+
+- There are no global variables.
+
+- There is no error handling.
+
+- The standard library is limited (there are only functions for input and output).
+
+## Support
+
+Email: pchen1@ocdsb.ca
 
 ## References
 
