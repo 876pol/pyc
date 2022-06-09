@@ -9,7 +9,7 @@ To clone this repository and run a basic program:
 ```bash
 git clone https://github.com/876pol/pyc.git
 cd pyc
-python interpreter/main.py examples/hello_world.pysc
+python pyc examples/hello_world.pysc
 ```
 
 More sample programs can be  found in `/example`.
