@@ -96,10 +96,10 @@ class ListRead(AST):
 
     Attributes:
         obj (AST): the list object to read.
-        expr_index (int): the expression giving the index of the list to read.
+        expr_index (AST): the expression giving the index of the list to read.
     """
 
-    def __init__(self, obj: AST, expr_index: int):
+    def __init__(self, obj: AST, expr_index: AST):
         self.obj = obj
         self.expr_index = expr_index
 
@@ -110,7 +110,7 @@ class ListAssign(AST):
 
     Attributes:
         obj (AST): the list object to assign.
-        expr_index (list): the expression giving the indicies of the list to assign.
+        expr_index (list): the expression giving the indices of the list to assign.
         operator (TokenType): the assignment operator.
         expression (AST): the value to assign.
         token (Token): the token that is printed when an error is thrown.
@@ -190,7 +190,7 @@ class IfElse(AST):
     Node that represents an if-else statement.
 
     Attributes:
-        conditional (list[tuple[AST, Block]]): list of conditions and respective blocks of code 
+        conditional (list[tuple[AST, Block]]): list of conditions and respective blocks of code
         to run. Represents all the if and else if blocks.
         otherwise (Block): block of code to run if no conditions have been met. This is `None` 
         if there is no else block.

@@ -6,6 +6,7 @@ each node holds a hash map. This data structure is used to hold all the variable
 and functions that the interpreter encounters.
 """
 
+
 class DictNode(object):
     """
     Class the represents a node in LinkedDict.
@@ -51,7 +52,7 @@ class LinkedDict(object):
         curr = self.top
 
         # Keeps looping until you reach the highest scope.
-        while curr.prev != None:
+        while curr.prev is not None:
             # If the key is present in the scope, return the corresponding value.
             if key in curr.hmap:
                 return curr.hmap[key]
@@ -76,7 +77,7 @@ class LinkedDict(object):
         curr = self.top
 
         # Keeps looping until you reach the highest scope.
-        while curr.prev != None:
+        while curr.prev is not None:
             # If the key is present in the scope, set the corresponding value and return.
             if key in curr.hmap:
                 curr.hmap[key] = value
@@ -122,7 +123,7 @@ class LinkedDict(object):
         curr = self.top
 
         # Keeps looping until you reach the highest scope.
-        while curr.prev != None:
+        while curr.prev is not None:
             # If the key is present in the scope, return True.
             if key in curr.hmap:
                 return True
@@ -142,7 +143,7 @@ class LinkedDict(object):
         curr = self.top
 
         # Keeps looping until you reach the highest scope.
-        while curr.prev != None:
+        while curr.prev is not None:
             # Append the current scope to the list.
             l.append(curr.hmap)
 

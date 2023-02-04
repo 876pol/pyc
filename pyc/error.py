@@ -22,6 +22,7 @@ class ErrorCode(Enum):
     INVALID_MAIN = "Invalid main function"
     OUT_OF_BOUNDS = "Out of bounds"
 
+
 class LexerError(Exception):
     """Error that occurs in the lexer."""
     pass
@@ -35,7 +36,6 @@ class ParserError(Exception):
 class InterpreterError(Exception):
     """Error that occurs in the interpreter."""
     pass
-
 
 
 """

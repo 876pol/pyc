@@ -6,6 +6,7 @@ This file holds the `Lexer` class that converts the code into tokens.
 
 from error import LexerError
 from tokens import RESERVED_KEYWORDS, SYMBOLS, Token, TokenType
+from collections import deque
 
 
 class Lexer(object):
@@ -18,6 +19,7 @@ class Lexer(object):
         current_char (str): the character that `pos` is pointing at.
         line (int): the current line being read.
         column (int): the index of the character on the current line that is being read.
+        buffer (deque[Token]): list of Tokens that have been read (during look-ahead) but have not been consumed.
     """
 
     def __init__(self, text: str):
@@ -31,6 +33,7 @@ class Lexer(object):
         self.current_char = self.text[self.pos]
         self.line = 1
         self.column = 1
+        self.buffer = deque()
 
     def advance(self) -> None:
         """Advance the `pos` pointer and set the `current_char` variable."""
@@ -139,7 +142,7 @@ class Lexer(object):
         Returns:
             Token: the variable or keyword read.
         """
-        # Keeps reading alphanumberical characters into a string.
+        # Keeps reading alphanumerical characters into a string.
         result = ""
         while self.current_char is not None and (self.current_char.isalnum() or self.current_char == "_"):
             result += self.current_char
@@ -159,7 +162,7 @@ class Lexer(object):
             Token: the next character.
         """
         # Checks if there are over two characters left in the input.
-        if self.peek() != None:
+        if self.peek() is not None:
             # Read the current character and the next character into a string.
             s = self.current_char + self.peek()
 
@@ -178,12 +181,9 @@ class Lexer(object):
         # Throw an error is no symbol is found.
         self.error()
 
-    def get_next_token(self) -> Token:
+    def load_next_token_into_buffer(self) -> None:
         """
-        Lexical analyzer. This method is responsible for breaking
-        the code apart into tokens.
-        Returns:
-            Token: the next token.
+        This method loads the next token from the code, and appends it to the end of the buffer.
         """
         # Keeps looping until a token is found.
         while self.current_char is not None:
@@ -191,35 +191,51 @@ class Lexer(object):
             # Skips whitespace.
             if self.current_char.isspace():
                 self.skip_whitespace()
-                continue
 
             # Skips a single line comment.
-            if self.current_char == "/" and self.peek() == "/":
+            elif self.current_char == "/" and self.peek() == "/":
                 self.skip_single_comment()
-                continue
 
             # Skips a multi line comment.
-            if self.current_char == "/" and self.peek() == "*":
+            elif self.current_char == "/" and self.peek() == "*":
                 self.skip_multi_comment()
-                continue
 
-            # If the current character is a quotation mark, return a string token.
-            if self.current_char == "\"":
-                return self.get_string()
+            # If the current character is a quotation mark, store a string token into the buffer.
+            elif self.current_char == "\"":
+                self.buffer.append(self.get_string())
 
-            # If the current character is a digit, return a number token.
-            if self.current_char.isdigit():
-                return self.get_number()
+            # If the current character is a digit, store a number token into the buffer.
+            elif self.current_char.isdigit():
+                self.buffer.append(self.get_number())
 
-            # If the current character is a letter, return a type or keyword token.
-            if self.current_char.isalpha() or self.current_char == "_":
-                return self.get_variable()
+            # If the current character is a letter, store a type or keyword token into the buffer.
+            elif self.current_char.isalpha() or self.current_char == "_":
+                self.buffer.append(self.get_variable())
 
-            # Return a symbol.
-            return self.get_next_symbol()
+            # Store a symbol into the buffer.
+            else:
+                self.buffer.append(self.get_next_symbol())
 
-        # If there is nothing left in the input, return an EOF token.
-        return Token(TokenType.EOF, None, line=self.line, column=self.column)
+        # If there is nothing left in the input, store an EOF token into the buffer.
+        self.buffer.append(Token(TokenType.EOF, None, line=self.line, column=self.column))
+
+    def get_next_token(self) -> Token:
+        """
+        This method reads the next token from the code, consuming it and returning it.
+        """
+        if len(self.buffer) == 0:
+            self.load_next_token_into_buffer()
+        return self.buffer.popleft()
+
+    def peek_next_tokens(self, tokens_skipped) -> Token:
+        """
+        This method reads ahead `tokens_skipped + 1` tokens, and returns the `tokens_skipped + 1`th next token.
+        """
+        while len(self.buffer) == 0 or (len(self.buffer) <= tokens_skipped and self.buffer[-1].type != TokenType.EOF):
+            self.load_next_token_into_buffer()
+        if tokens_skipped < len(self.buffer):
+            return self.buffer[tokens_skipped]
+        return self.buffer[-1]
 
     def error(self) -> None:
         """Throws an error and states the current character, line, and column on which the error happened"""

@@ -30,31 +30,9 @@ class LibraryFunction(object):
         pass
 
 
-"""
-The next three classes are for adding functions to print ints, floats, and strings.
-"""
-
-
-class PrintInt(LibraryFunction):
-    name = "printi"
-    type = TokenType.VOID
-    args = [FunctionArgument(TokenType.INT, Token(TokenType.TYPE, "p"))]
-
-    def run(scopes):
-        print(scopes.get("p").value)
-
-
-class PrintFloat(LibraryFunction):
-    name = "printf"
-    type = TokenType.VOID
-    args = [FunctionArgument(TokenType.FLOAT, Token(TokenType.TYPE, "p"))]
-
-    def run(scopes):
-        print(scopes.get("p").value)
-
-
-class PrintString(LibraryFunction):
-    name = "prints"
+class Print(LibraryFunction):
+    """Library function that allows for printing a string (other datatypes can be printed through casting)."""
+    name = "print"
     type = TokenType.VOID
     args = [FunctionArgument(TokenType.STRING, Token(TokenType.TYPE, "p"))]
 
@@ -62,24 +40,7 @@ class PrintString(LibraryFunction):
         print(scopes.get("p").value)
 
 
-class PrintList(LibraryFunction):
-    name = "printl"
-    type = TokenType.VOID
-    args = [FunctionArgument(TokenType.LIST, Token(TokenType.TYPE, "p"))]
-
-    def run(scopes):
-        def to_printable_list(curr) -> list:
-            ret_val = []
-            for e in curr:
-                if type(e.value) == list:
-                    ret_val.append(to_printable_list(e.value))
-                else:
-                    ret_val.append(e.value)
-            return ret_val
-        print(to_printable_list(scopes.get("p").value))
-
-
-def next():
+def next_token():
     """Reads a token from stdin."""
     token = ""
     while True:
@@ -111,35 +72,17 @@ The next four classes are for adding functions to take ints, floats, and strings
 """
 
 
-class InputInt(LibraryFunction):
-    name = "inputi"
-    type = TokenType.INT
-    args = []
-
-    def run(scopes):
-        raise ReturnException(build_value(TokenType.INTL, int(next())))
-
-
-class InputFloat(LibraryFunction):
-    name = "inputf"
-    type = TokenType.FLOAT
-    args = []
-
-    def run(scopes):
-        raise ReturnException(build_value(TokenType.FLOATL, float(next())))
-
-
-class InputString(LibraryFunction):
-    name = "inputs"
+class Scan(LibraryFunction):
+    name = "scan"
     type = TokenType.STRING
     args = []
 
     def run(scopes):
-        raise ReturnException(build_value(TokenType.STRINGL, next()))
+        raise ReturnException(build_value(TokenType.STRINGL, next_token()))
 
 
-class InputLine(LibraryFunction):
-    name = "inputline"
+class GetLine(LibraryFunction):
+    name = "getline"
     type = TokenType.STRING
     args = []
 

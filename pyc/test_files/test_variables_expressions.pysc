@@ -1,0 +1,19 @@
+int main() {
+    int i = (1 << (4 * 2 / 3)) % 9;
+    float f = 4.0 * 12 / 2.4;
+    string s = "12" + "34";
+
+    print((string) i);
+    print((string) f);
+    print(s);
+
+    i *= (int) scan();
+    f += (float) scan();
+    s += scan();
+
+    print((string) i);
+    print((string) f);
+    print(s);
+
+    return 0;
+}
