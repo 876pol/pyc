@@ -6,7 +6,7 @@ This file holds all the standard library functions that are implemented in the i
 
 import sys
 
-from ast import FunctionArgument
+from pyc_ast import FunctionArgument
 from error import ReturnException
 from tokens import Token, TokenType
 from value import build_value

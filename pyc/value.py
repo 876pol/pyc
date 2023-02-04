@@ -3,7 +3,7 @@ ICS3U
 Paul Chen
 This file holds the `Value` class and declares all possible types used by the interpreter (int, float, string, list).
 """
-from ast import AST
+from pyc_ast import AST
 from tokens import TokenType
 
 

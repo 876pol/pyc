@@ -4,8 +4,8 @@ Paul Chen
 This file holds the `Parser` class that converts tokens into an abstract syntax tree.
 """
 
-import ast
-from ast import AST
+import pyc_ast
+from pyc_ast import AST
 from error import ErrorCode, ParserError
 from lexer import Lexer
 from tokens import TokenType
@@ -52,9 +52,9 @@ class Parser(object):
 
     def empty(self):
         """Node that does nothing."""
-        return ast.NoOperation()
+        return pyc_ast.NoOperation()
 
-    def list_literal(self) -> ast.AST:
+    def list_literal(self) -> pyc_ast.AST:
         """list: LSPAR [expression, {COMMA, expression}] RSPAR"""
         self.eat(TokenType.LSPAR)
         l = []
@@ -64,7 +64,7 @@ class Parser(object):
             self.eat(TokenType.COMMA)
             l.append(self.expression())
         self.eat(TokenType.RSPAR)
-        return ast.ListVal(l)
+        return pyc_ast.ListVal(l)
 
     def function_call(self) -> AST:
         """
@@ -82,9 +82,9 @@ class Parser(object):
             args.append(self.expression())
 
         self.eat(TokenType.RRPAR)
-        return ast.FunctionCall(variable.value, args, variable.token)
+        return pyc_ast.FunctionCall(variable.value, args, variable.token)
 
-    def term(self) -> ast.AST:
+    def term(self) -> pyc_ast.AST:
         """
         term:
             [MINUS | BIT_NOT | LOGICAL_NOT], ((INT | FLOAT | STRING) | (LRPAR, expression, LRPAR)) | 
@@ -97,12 +97,12 @@ class Parser(object):
         # If `token` is an int, float, or string.
         if token.type in (TokenType.INTL, TokenType.FLOATL, TokenType.STRINGL):
             self.eat(token.type)
-            return ast.Val(token)
+            return pyc_ast.Val(token)
 
         # If `token` is a unary operator.
         elif token.type in (TokenType.MINUS, TokenType.BIT_NOT, TokenType.LOGICAL_NOT):
             self.eat(token.type)
-            return ast.UnaryOperator(token.type, self.term(), token=token)
+            return pyc_ast.UnaryOperator(token.type, self.term(), token=token)
 
         # If the next few tokens represent a cast operator.
         elif token.type == TokenType.LRPAR and self.peek_next_tokens(0).type in (
@@ -111,7 +111,7 @@ class Parser(object):
             token.type = self.current_token.type
             self.eat(token.type)
             self.eat(TokenType.RRPAR)
-            return ast.CastOperator(token.type, self.term(), token=token)
+            return pyc_ast.CastOperator(token.type, self.term(), token=token)
 
         # If the next few tokens represent an expression.
         elif token.type == TokenType.LRPAR:
@@ -135,20 +135,20 @@ class Parser(object):
                 self.eat(TokenType.LSPAR)
                 expr_index = self.expression()
                 self.eat(TokenType.RSPAR)
-                variable = ast.ListRead(variable, expr_index)
+                variable = pyc_ast.ListRead(variable, expr_index)
             return variable
 
         # If the next token is a variable.
         else:
             return self.variable()
 
-    def variable(self) -> ast.AST:
+    def variable(self) -> pyc_ast.AST:
         """Reads the next token and checks if it is a TYPE."""
-        node = ast.Variable(self.current_token.type, self.current_token.value, token=self.current_token)
+        node = pyc_ast.Variable(self.current_token.type, self.current_token.value, token=self.current_token)
         self.eat(TokenType.TYPE)
         return node
 
-    def operation(self, operations: tuple, lower_prec) -> ast.AST:
+    def operation(self, operations: tuple, lower_prec) -> pyc_ast.AST:
         """
         Function that handles a series of binary operations with the same precedence (Ex. "*", "/", and "%").
         When it receives an operation with lower precedence, go to the corresponding function.
@@ -161,34 +161,34 @@ class Parser(object):
         while self.current_token.type in operations:
             token = self.current_token
             self.eat(token.type)
-            num = ast.BinaryOperator(
+            num = pyc_ast.BinaryOperator(
                 num, token.type, lower_prec(), token=token)
         return num
 
     # The next few lines establish the order of operations:
     # multiplicative -> additive -> comparative -> bitwise -> logical
 
-    def multiplicative(self) -> ast.AST:
+    def multiplicative(self) -> pyc_ast.AST:
         """multiplicative : term, {(MUL | DIV | MOD), term};"""
         return self.operation(
             (TokenType.MUL, TokenType.DIV, TokenType.MOD), self.term)
 
-    def additive(self) -> ast.AST:
+    def additive(self) -> pyc_ast.AST:
         """additive : multiplicative, {(PLUS | MINUS), multiplicative};"""
         return self.operation(
             (TokenType.PLUS, TokenType.MINUS), self.multiplicative)
 
-    def comparative(self) -> ast.AST:
+    def comparative(self) -> pyc_ast.AST:
         """comparative : additive, {(EQUAL | NOT_EQUAL | LESS | GREATER | LESS_EQUAL | GREATER_EQUAL), additive};"""
         return self.operation((TokenType.EQUAL, TokenType.NOT_EQUAL, TokenType.LESS,
                                TokenType.GREATER, TokenType.LESS_EQUAL, TokenType.GREATER_EQUAL), self.additive)
 
-    def bitwise(self) -> ast.AST:
+    def bitwise(self) -> pyc_ast.AST:
         """bitwise : comparative, {(BIT_AND | BIT_OR | BIT_XOR | BIT_LSHIFT | BIT_RSHIFT), comparative};"""
         return self.operation((TokenType.BIT_AND, TokenType.BIT_OR, TokenType.LESS,
                                TokenType.BIT_XOR, TokenType.BIT_LSHIFT, TokenType.BIT_RSHIFT), self.comparative)
 
-    def logical(self) -> ast.AST:
+    def logical(self) -> pyc_ast.AST:
         """logical : bitwise, {(LOGICAL_AND | LOGICAL_OR), bitwise};"""
         return self.operation(
             (TokenType.LOGICAL_AND, TokenType.LOGICAL_OR), self.bitwise)
@@ -196,7 +196,7 @@ class Parser(object):
     # expression : logical; the function `expression` points to the operator with the lowest precedence.
     expression = logical
 
-    def declaration_statement(self) -> ast.AST:
+    def declaration_statement(self) -> pyc_ast.AST:
         """declaration_statement: (INT | FLOAT | STRING | LIST), variable, ASSIGN, expression; """
         type = self.current_token.type
         self.eat((TokenType.INT, TokenType.FLOAT,
@@ -204,9 +204,9 @@ class Parser(object):
         name = self.variable()
         self.eat(TokenType.ASSIGN)
         expr = self.expression()
-        return ast.DeclarationStatement(type, name, expr)
+        return pyc_ast.DeclarationStatement(type, name, expr)
 
-    def function_declaration(self) -> ast.AST:
+    def function_declaration(self) -> pyc_ast.AST:
         """
         function_declaration:
             (VOID | INT | FLOAT | STRING | LIST), variable, LRPAR,
@@ -232,7 +232,7 @@ class Parser(object):
             self.eat((TokenType.INT, TokenType.FLOAT,
                       TokenType.STRING, TokenType.LIST))
             var = self.variable()
-            args.append(ast.FunctionArgument(arg_type, var.token))
+            args.append(pyc_ast.FunctionArgument(arg_type, var.token))
 
             # Keeps reading all the other ones.
             while self.current_token.type != TokenType.RRPAR:
@@ -241,16 +241,16 @@ class Parser(object):
                 self.eat((TokenType.INT, TokenType.FLOAT,
                           TokenType.STRING, TokenType.LIST))
                 var = self.variable()
-                args.append(ast.FunctionArgument(arg_type, var.token))
+                args.append(pyc_ast.FunctionArgument(arg_type, var.token))
 
         self.eat(TokenType.RRPAR)
 
         # Reads the main function body.
         body = self.block()
 
-        return ast.FunctionDeclaration(_type, name, args, body)
+        return pyc_ast.FunctionDeclaration(_type, name, args, body)
 
-    def assignment_statement(self) -> ast.AST:
+    def assignment_statement(self) -> pyc_ast.AST:
         # TODO: change docs
         """
         assignment_statement_or_function_call:
@@ -281,7 +281,7 @@ class Parser(object):
         if token.type in assign_op:
             self.eat(assign_op)
             value = self.expression()
-            return ast.AssignmentStatement(variable, token.type, value, token)
+            return pyc_ast.AssignmentStatement(variable, token.type, value, token)
         # Runs if the next token is a square bracket.
         elif token.type == TokenType.LSPAR:
             indices = []
@@ -293,9 +293,9 @@ class Parser(object):
             token = self.current_token
             self.eat(assign_op)
             value = self.expression()
-            return ast.ListAssign(variable, indices, token.type, value, token)
+            return pyc_ast.ListAssign(variable, indices, token.type, value, token)
 
-    def line_statement(self) -> ast.AST:
+    def line_statement(self) -> pyc_ast.AST:
         """line_statement: (function_call | assignment_statement | declaration_statement); """
         if self.current_token.type == TokenType.TYPE and self.peek_next_tokens(0).type == TokenType.LRPAR:
             node = self.function_call()
@@ -307,7 +307,7 @@ class Parser(object):
             self.error(ErrorCode.UNEXPECTED_TOKEN, self.current_token)
         return node
 
-    def statement(self) -> ast.AST:
+    def statement(self) -> pyc_ast.AST:
         """
         statement:
             (block | while_statement | do_while_statement | for_statement | ifelse_statement | SEMI |
@@ -344,7 +344,7 @@ class Parser(object):
             results.append(self.statement())
         return results
 
-    def if_else_statement(self) -> ast.AST:
+    def if_else_statement(self) -> pyc_ast.AST:
         """
         if_else_statement:
             IF, LRPAR, expression, RRPAR,
@@ -375,9 +375,9 @@ class Parser(object):
                 break
             else:
                 self.error(ErrorCode.UNEXPECTED_TOKEN, self.current_token)
-        return ast.IfElse(block_list, last_block)
+        return pyc_ast.IfElse(block_list, last_block)
 
-    def for_loop(self) -> ast.AST:
+    def for_loop(self) -> pyc_ast.AST:
         """for_loop: FOR, LRPAR, line_statement, expression, line_statement, RRPAR, block; """
         self.eat(TokenType.FOR)
         self.eat(TokenType.LRPAR)
@@ -388,18 +388,18 @@ class Parser(object):
         inc = self.line_statement()
         self.eat(TokenType.RRPAR)
         block = self.block()
-        return ast.ForLoop(init, expr, inc, block)
+        return pyc_ast.ForLoop(init, expr, inc, block)
 
-    def while_loop(self) -> ast.AST:
+    def while_loop(self) -> pyc_ast.AST:
         """while_loop: WHILE, LRPAR, expression, RRPAR, block; """
         self.eat(TokenType.WHILE)
         self.eat(TokenType.LRPAR)
         expr = self.expression()
         self.eat(TokenType.RRPAR)
         block = self.block()
-        return ast.WhileLoop(expr, block)
+        return pyc_ast.WhileLoop(expr, block)
 
-    def do_while_loop(self) -> ast.AST:
+    def do_while_loop(self) -> pyc_ast.AST:
         """do_while_loop: DO, block, WHILE, LRPAR, expression, RRPAR, SEMI; """
         self.eat(TokenType.DO)
         block = self.block()
@@ -408,42 +408,42 @@ class Parser(object):
         expr = self.expression()
         self.eat(TokenType.RRPAR)
         self.eat(TokenType.SEMI)
-        return ast.DoWhile(expr, block)
+        return pyc_ast.DoWhile(expr, block)
 
-    def break_statement(self) -> ast.AST:
+    def break_statement(self) -> pyc_ast.AST:
         """break_statement: BREAK, SEMI;"""
         curr_token = self.current_token
         self.eat(TokenType.BREAK)
         self.eat(TokenType.SEMI)
-        return ast.BreakStatement(curr_token)
+        return pyc_ast.BreakStatement(curr_token)
 
-    def continue_statement(self) -> ast.AST:
+    def continue_statement(self) -> pyc_ast.AST:
         """continue_statement: CONTINUE, SEMI;"""
         curr_token = self.current_token
         self.eat(TokenType.CONTINUE)
         self.eat(TokenType.SEMI)
-        return ast.ContinueStatement(curr_token)
+        return pyc_ast.ContinueStatement(curr_token)
 
-    def return_statement(self) -> ast.AST:
+    def return_statement(self) -> pyc_ast.AST:
         """return_statement: RETURN, [expression], SEMI;"""
         curr_token = self.current_token
         self.eat(TokenType.RETURN)
         if self.current_token.type == TokenType.SEMI:
             self.eat(TokenType.SEMI)
-            return ast.ReturnStatement(ast.NoOperation(), curr_token)
+            return pyc_ast.ReturnStatement(pyc_ast.NoOperation(), curr_token)
         else:
             expr = self.expression()
             self.eat(TokenType.SEMI)
-            return ast.ReturnStatement(expr, curr_token)
+            return pyc_ast.ReturnStatement(expr, curr_token)
 
-    def block(self) -> ast.AST:
+    def block(self) -> pyc_ast.AST:
         """block: LCPAR, statement_list, RCPAR; """
         self.eat(TokenType.LCPAR)
         nodes = self.statement_list()
         self.eat(TokenType.RCPAR)
-        return ast.Block(nodes)
+        return pyc_ast.Block(nodes)
 
-    def program(self) -> ast.AST:
+    def program(self) -> pyc_ast.AST:
         """program: {function_declaration | declaration_statement}"""
         statements = []
         while self.current_token.type != TokenType.EOF:
@@ -452,9 +452,9 @@ class Parser(object):
             else:
                 statements.append(self.declaration_statement())
                 self.eat(TokenType.SEMI)
-        return ast.Program(statements)
+        return pyc_ast.Program(statements)
 
-    def parse(self) -> ast.AST:
+    def parse(self) -> pyc_ast.AST:
         """Parses the input into an abstract syntax tree."""
         return self.program()
 

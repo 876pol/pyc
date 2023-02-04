@@ -4,7 +4,7 @@ Paul Chen
 This file holds the `Interpreter` class that runs an abstract syntax tree.
 """
 import value
-from ast import BuiltinFunction, AST, FunctionCall, UnaryOperator, BinaryOperator, CastOperator, Val, ListVal, \
+from pyc_ast import BuiltinFunction, AST, FunctionCall, UnaryOperator, BinaryOperator, CastOperator, Val, ListVal, \
     ListRead, ListAssign, Variable, DeclarationStatement, AssignmentStatement, Block, IfElse, ForLoop, WhileLoop, \
     DoWhile, FunctionDeclaration, BreakStatement, ContinueStatement, ReturnStatement, Program
 from lexer import TokenType
