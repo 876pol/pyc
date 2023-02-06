@@ -21,7 +21,7 @@ cd pyc
 python pyc examples/hello_world.pysc
 ```
 
-More sample programs can be found in `/example`.
+More sample programs can be found in `/examples`.
 
 ## Known Bugs / Limitations
 
