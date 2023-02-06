@@ -5,13 +5,10 @@ Interpreted C-like programming language written with Python 3. Created as my ICS
 ## Features
 
 - Initializing variables
-
 - Evaluating expressions
-
 - Control Structures
-
 - Functions
-
+- Arrays
 - C-like syntax
 
 ## Installation
@@ -28,15 +25,10 @@ More sample programs can be found in `/example`.
 
 ## Known Bugs / Limitations
 
-- Many error messages aren't clear.
-
-- Lists are fairly limited.
-
-- There are no global variables.
-
-- There is no error handling.
-
+- Many error messages are not clear.
 - The standard library is limited (there are only functions for input and output).
+- pyc has a string data type instead of a char array (like in C), and string manipulation is not possible.
+- Features such as pointers or structs are unavailable.
 
 ## Support
 
