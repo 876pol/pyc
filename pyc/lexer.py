@@ -7,6 +7,7 @@ This file holds the `Lexer` class that converts the code into tokens.
 from error import LexerError
 from tokens import RESERVED_KEYWORDS, SYMBOLS, Token, TokenType
 from collections import deque
+from typing import Optional
 
 
 class Lexer(object):
@@ -22,7 +23,7 @@ class Lexer(object):
         buffer (deque[Token]): list of Tokens that have been read (during look-ahead) but have not been consumed.
     """
 
-    def __init__(self, text: str):
+    def __init__(self, text: str) -> None:
         """
         Inits lexer class.
         Args:
@@ -54,7 +55,7 @@ class Lexer(object):
             self.current_char = self.text[self.pos]
             self.column += 1
 
-    def peek(self) -> str:
+    def peek(self) -> Optional[str]:
         """
         Peeks into the character that follows `current_char`.
         Returns:
@@ -227,14 +228,14 @@ class Lexer(object):
             self.load_next_token_into_buffer()
         return self.buffer.popleft()
 
-    def peek_next_tokens(self, tokens_skipped) -> Token:
+    def peek_nth_next_token(self, n: int) -> Token:
         """
-        This method reads ahead `tokens_skipped + 1` tokens, and returns the `tokens_skipped + 1`th next token.
+        This method reads ahead `n + 1` tokens, and returns the `n + 1`th next token.
         """
-        while len(self.buffer) == 0 or (len(self.buffer) <= tokens_skipped and self.buffer[-1].type != TokenType.EOF):
+        while len(self.buffer) == 0 or (len(self.buffer) <= n and self.buffer[-1].type != TokenType.EOF):
             self.load_next_token_into_buffer()
-        if tokens_skipped < len(self.buffer):
-            return self.buffer[tokens_skipped]
+        if n < len(self.buffer):
+            return self.buffer[n]
         return self.buffer[-1]
 
     def error(self) -> None:

@@ -1,0 +1,80 @@
+/*
+    This file contains code for automated testing of functions in pyc.
+*/
+
+// recursion
+int fib_brute_force(int n) {
+    if (n <= 1) {
+        return 1;
+    }
+    return fib_brute_force(n - 1) + fib_brute_force(n - 2);
+}
+
+// recursion + global variables
+int dp[21];
+
+int fib_with_dp(int n) {
+    if (dp[n] != 0) {
+        return dp[n];
+    }
+    if (n <= 1) {
+        dp[n] = 1;
+    } else {
+        dp[n] = fib_with_dp(n - 1) + fib_with_dp(n - 2);
+    }
+    return dp[n];
+}
+
+// function scope
+int GLOBAL = 123;
+
+void a(int b) {
+    print((string) (GLOBAL + b) + "\n");
+    b = 5;
+    print((string) (GLOBAL + b) + "\n");
+}
+
+int c(int d) {
+    a(d);
+    int GLOBAL = 0;
+    print((string) (d + GLOBAL) + "\n");
+    return d + 5;
+}
+
+// multiple arguments
+void m(string s, int a, int b, float c) {
+    print(s + "\n");
+    print((string) a + "\n");
+    print((string) b + "\n");
+    print((string) c + "\n");
+}
+
+// bare return
+void r() {
+    return;
+}
+
+// pass in array
+void test(int a[], int b, string s) {
+    for (int i = 0; i < 4; i += 1) {
+        print((string) a[i] + " ");
+        a[i] += 1;
+    }
+    print((string) b + " " + s + "\n");
+    b += 1;
+}
+
+
+int main() {
+    print((string) fib_brute_force(5) + "\n");
+    fib_with_dp(20);
+    print((string) (fib_with_dp(20) + dp[19]) + "\n");
+    print((string) c(100) + "\n");
+    m("a b c d e", 1, 2, -0.23);
+    r();
+    int b[4] = {1, 2, 3, 4};
+    int c = 0;
+    test(b, c, "hello");
+    test(b, c, "hello");
+    return 0;
+}

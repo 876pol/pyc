@@ -5,6 +5,7 @@ This files holds the code for a "Linked Hash Map", which is a linked-list / tree
 each node holds a hash map. This data structure is used to hold all the variables
 and functions that the interpreter encounters.
 """
+from typing import Dict, Optional, Any
 
 
 class DictNode(object):
@@ -16,7 +17,7 @@ class DictNode(object):
         prev (DictNode): the next node / next highest scope.
     """
 
-    def __init__(self, prev):
+    def __init__(self, prev: Optional["DictNode"]) -> None:
         self.hmap = {}
         self.prev = prev
 
@@ -32,12 +33,12 @@ class LinkedDict(object):
         bottom (DictNode): the node at the bottom of the stack.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Inits LinkedDict class."""
         self.top = DictNode(DictNode(None))
         self.bottom = self.top
 
-    def get(self, key) -> object:
+    def get(self, key: str) -> Any:
         """
         Gets the value corresponding to a key from the data structure. In case of duplicates,
         this function returns the value corresponding to the key with the lowest scope.
@@ -63,7 +64,7 @@ class LinkedDict(object):
         # Throws an error if the key is not present.
         raise KeyError(str(key))
 
-    def set(self, key, value) -> None:
+    def set(self, key: str, value: Any) -> None:
         """
         Sets the value for a key that is already present in the map. In case of duplicates, 
         this function sets the value corresponding to the key with the lowest scope.
@@ -89,7 +90,7 @@ class LinkedDict(object):
         # Throws an error if the key is not present.
         raise KeyError(str(key))
 
-    def insert(self, key, value) -> None:
+    def insert(self, key: str, value: Any) -> None:
         """
         Inserts a key and its corresponding value into the lowest scope.
         Args:
@@ -106,19 +107,19 @@ class LinkedDict(object):
         self.top.hmap[key] = value
 
     def push(self) -> None:
-        """Creates a scope beneath the currently lowest scope."""
+        """Creates a scope beneath the current lowest scope."""
         self.top = DictNode(self.top)
 
     def pop(self) -> None:
-        """Removes the scope beneath the currently lowest scope."""
+        """Removes the scope beneath the current lowest scope."""
         self.top = self.top.prev
 
-    def peek(self) -> dict:
+    def peek(self) -> Dict:
         """Returns a dict of the lowest scope."""
         return self.top.hmap
 
-    def __contains__(self, key) -> bool:
-        """Checks if a value is present in the data structure."""
+    def __contains__(self, key: str) -> bool:
+        """Checks if a name is present in the data structure."""
         # Begins with the lowest scope.
         curr = self.top
 
@@ -137,7 +138,7 @@ class LinkedDict(object):
     def __str__(self) -> str:
         """String representation of the data structure."""
         # List of all the hashmaps
-        l = []
+        map_list = []
 
         # Begins with the lowest scope.
         curr = self.top
@@ -145,13 +146,13 @@ class LinkedDict(object):
         # Keeps looping until you reach the highest scope.
         while curr.prev is not None:
             # Append the current scope to the list.
-            l.append(curr.hmap)
+            map_list.append(curr.hmap)
 
             # Otherwise go to the next highest scope.
             curr = curr.prev
 
         # Reverse the list - we want the highest scope to be first in the list.
-        l.reverse()
+        map_list.reverse()
 
         # Return a string representation of the list.
-        return str(l)
+        return str(map_list)

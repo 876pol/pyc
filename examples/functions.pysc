@@ -7,7 +7,7 @@ int fib(int n) {
 }
 
 int main() {
-    int n = inputi();
-    printi(fib(n));
+    int n = (int) scan();
+    print((string) fib(n));
     return 0;
 }

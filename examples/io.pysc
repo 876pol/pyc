@@ -1,9 +1,9 @@
 int main() {
-    int i = inputi();
-    float f = inputf();
-    string s = inputs();
-    prints("You inputed " + (string) i);
-    prints("You inputed " + (string) f);
-    prints("You inputed " + s);
+    int i = (int) scan();
+    float f = (float) scan();
+    string s = scan();
+    print("You inputed " + (string) i + "\n");
+    print("You inputed " + (string) f + "\n");
+    print("You inputed " + s + "\n");
     return 0;
 }

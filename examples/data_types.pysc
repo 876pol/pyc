@@ -1,0 +1,24 @@
+int main() {
+    // Initialization of variables and evaluation of expressions.
+    int i = 5 / 2 + 10 % 3;
+    float f = 100.0 / 2 + 23;
+    string s = "hel" + "lo";
+
+    // Initialization of arrays.
+    int arr[][] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    string s_arr[2] = {"hello", "world"};
+
+    print((string) i + "\n");
+    print((string) f + "\n");
+    print(s + "\n");
+
+    print((string) arr[0][0]);
+    print(" ");
+    print((string) arr[0][1]);
+    print(" ");
+    print((string) arr[0][2]);
+    print("\n");
+
+    print(s_arr[0] + " " + s_arr[1] + "\n");
+    return 0;
+}

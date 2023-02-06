@@ -1,0 +1,80 @@
+/*
+    This file contains code for automated testing of variables and expressions in pyc.
+*/
+
+int gi = 10;
+float gf = 8.0;
+
+void modify() {
+    gi += 15;
+    gf -= 20;
+}
+
+int main() {
+    int i = (1 << (4 * 2 / 3)) % 9;
+    float f = 4.0 * 12 / 2.4;
+    string s = "12" + "34";
+
+    print((string) i + "\n");
+    print((string) f + "\n");
+    print(s + "\n");
+
+    i *= 3;
+    f += 4;
+    s += "hello";
+
+    print((string) i + "\n");
+    print((string) f + "\n");
+    print(s + "\n");
+
+    int arr[][] = {{1, 2, 3, 4, 5}, {2, 2, 2, 2, 2}, {4, 3, 2, 1, 0}, {0, 0, 0, 0, 0}, {-100, -99, -98, -97, -96}};
+    print((string) arr[0][0] + "\n");
+    print((string) arr[4][4] + "\n");
+    print((string) (arr[2][3] + arr[1][1]) + "\n");
+
+    arr[0][0] *= 2;
+    arr[4][4] -= arr[2][3];
+
+    print((string) arr[0][0] + "\n");
+    print((string) arr[4][4] + "\n");
+    print((string) (arr[2][3] + arr[1][1]) + "\n");
+
+    string sarr[] = {"hello", "world"};
+    print(sarr[0] + " " + sarr[1] + "\n");
+
+    sarr[0] = "Hello";
+    sarr[1] = "World!";
+    print(sarr[0] + " " + sarr[1] + "\n");
+
+    print((string) gi + "\n");
+    print((string) gf + "\n");
+
+    modify();
+
+    print((string) gi + "\n");
+    print((string) gf + "\n");
+
+    int gi = 123;
+    float gf = (float) "95.0";
+
+    print((string) gi + "\n");
+    print((string) gf + "\n");
+
+    int a[10][10];
+    for (int i = 0; i < 10; i += 1) {
+        for (int j = 0; j < 10; j += 1) {
+            a[i][j] = i * 10 + j;
+        }
+    }
+    for (int i = 0; i < 10; i += 1) {
+        for (int j = 0; j < 10; j += 1) {
+            print((string) a[i][j]);
+            if (j != 9) {
+                print(" ");
+            }
+        }
+        print("\n");
+    }
+
+    return 0;
+}

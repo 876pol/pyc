@@ -3,8 +3,10 @@ ICS3U
 Paul Chen
 This file holds the `Value` class and declares all possible types used by the interpreter (int, float, string, list).
 """
-from pyc_ast import AST
-from tokens import TokenType
+from typing import Any, Callable, List, Optional, Union
+
+from ast_nodes import BlockStatementNode, BuiltInFunctionCallStatementNode, FunctionArgument, ASTNode
+from tokens import TokenType, TokenType as Tt
 
 
 class Value(object):
@@ -13,25 +15,25 @@ class Value(object):
 
     Attributes:
         type (TokenType): the type of variable.
-        value (Any): the value of the variable.
+        value (Any): the name of the variable.
     """
 
     default = None
 
-    def __init__(self, _type: TokenType, value):
-        self.type = _type
+    def __init__(self, token_type: TokenType, value: Any) -> None:
+        self.type = token_type
         self.value = value
 
-    def binary_operator(self, operator, obj):
+    def binary_operator(self, operator: TokenType, obj: "Value") -> Optional[Callable]:
         return None
 
-    def unary_operator(self, operator):
+    def unary_operator(self, operator: TokenType) -> Optional[Callable]:
         return None
 
-    def assignment_operator(self, operator, obj):
+    def assignment_operator(self, operator: TokenType, obj: "Value") -> Optional[Callable]:
         return None
 
-    def cast_operator(self, operator):
+    def cast_operator(self, operator: TokenType) -> Optional[Callable]:
         return None
 
     def __str__(self) -> str:
@@ -40,30 +42,53 @@ class Value(object):
     __repr__ = __str__
 
 
-def build_value(_type: TokenType, value=None) -> Value:
+def build_value(token_type: TokenType, value: Optional[Any] = None) -> Value:
     """
-    Builds an instance of the `Value` object from a type and value. This is different from the 
-    constructor of the `Value` class because it returns a subclass of `Value` (Int, Float, or String).
+    Builds an instance of the `Value` object from a type and name. This is different from the
+    constructor of the `Value` class because it returns a subclass of `Value`.
     Args:
-        _type (TokenType): the type of object that will be contained.
-        value (Any): the value of the object.
+        token_type (TokenType): the type of value that will be contained.
+        value (Any): the value held.
     Returns:
-        Value: the value that is built.
+        Value: the Value that is built.
     """
+    # Return default values.
     if value is None:
-        if _type == TokenType.INTL:
-            return Int(_type, 0)
-        elif _type == TokenType.FLOATL:
-            return Float(_type, 0.0)
-        elif _type == TokenType.STRINGL:
-            return String(_type, "")
+        if token_type == Tt.INTL:
+            return IntValue(token_type, 0)
+        elif token_type == Tt.FLOATL:
+            return FloatValue(token_type, 0.0)
+        elif token_type == Tt.STRINGL:
+            return StringValue(token_type, "")
+        elif token_type == Tt.ARRAYL:
+            return InitializerListValue(token_type, [])
+        else:
+            return NullValue(Tt.VOIDL, None)
+    # return user-defined values.
     else:
-        if _type == TokenType.INTL:
-            return Int(_type, int(value))
-        elif _type == TokenType.FLOATL:
-            return Float(_type, float(value))
-        elif _type == TokenType.STRINGL:
-            return String(_type, str(value))
+        def check_instance_else_error(_type):
+            if not isinstance(value, _type):
+                raise ValueError()
+
+        if token_type == Tt.INTL:
+            check_instance_else_error(int)
+            return IntValue(token_type, value)
+        elif token_type == Tt.FLOATL:
+            check_instance_else_error(float)
+            return FloatValue(token_type, value)
+        elif token_type == Tt.STRINGL:
+            check_instance_else_error(str)
+            return StringValue(token_type, value)
+        elif token_type == Tt.ARRAYL:
+            check_instance_else_error(list)
+            return InitializerListValue(token_type, value)
+        else:
+            if value is not None:
+                raise ValueError()
+            return NullValue(Tt.VOIDL, None)
+
+
+bv = build_value
 
 
 def object_to_identifier(obj: TokenType) -> TokenType:
@@ -75,10 +100,9 @@ def object_to_identifier(obj: TokenType) -> TokenType:
         TokenType: the new type.
     """
     conversion = {
-        TokenType.INTL: TokenType.INT,
-        TokenType.FLOATL: TokenType.FLOAT,
-        TokenType.STRINGL: TokenType.STRING,
-        TokenType.LISTL: TokenType.LIST,
+        Tt.INTL: Tt.INT,
+        Tt.FLOATL: Tt.FLOAT,
+        Tt.STRINGL: Tt.STRING
     }
     if obj not in conversion:
         raise KeyError()
@@ -91,13 +115,12 @@ def identifier_to_object(obj: TokenType) -> TokenType:
     Args:
         obj (TokenType): the type to convert.
     Returns:
-        TokenType: the new type.
+        Tt: the new type.
     """
     conversion = {
-        TokenType.INT: TokenType.INTL,
-        TokenType.FLOAT: TokenType.FLOATL,
-        TokenType.STRING: TokenType.STRINGL,
-        TokenType.LIST: TokenType.LISTL,
+        Tt.INT: Tt.INTL,
+        Tt.FLOAT: Tt.FLOATL,
+        Tt.STRING: Tt.STRINGL
     }
     if obj not in conversion:
         raise KeyError()
@@ -107,251 +130,173 @@ def identifier_to_object(obj: TokenType) -> TokenType:
 """The next four class are subclasses of `Value`. They define all the operations that these types can perform."""
 
 
-class Int(Value):
-    def binary_operator(self, operator, obj):
+class IntValue(Value):
+    def binary_operator(self, operator: TokenType, obj: Value) -> Optional[Callable]:
         operations = {
-            (TokenType.PLUS, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value + obj.value),
-            (TokenType.MINUS, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value - obj.value),
-            (TokenType.MUL, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value * obj.value),
-            (TokenType.DIV, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value / obj.value),
-            (TokenType.MOD, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value % obj.value),
-            (TokenType.LOGICAL_AND, TokenType.INTL): lambda: build_value(TokenType.INTL,
-                                                                         bool(self.value and obj.value)),
-            (TokenType.LOGICAL_OR, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value or obj.value)),
-            (TokenType.EQUAL, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value == obj.value)),
-            (TokenType.NOT_EQUAL, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value != obj.value)),
-            (TokenType.LESS, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value < obj.value)),
-            (TokenType.GREATER, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value > obj.value)),
-            (TokenType.LESS_EQUAL, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value <= obj.value)),
-            (TokenType.GREATER_EQUAL, TokenType.INTL): lambda: build_value(TokenType.INTL,
-                                                                           bool(self.value >= obj.value)),
-            (TokenType.BIT_AND, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value & obj.value),
-            (TokenType.BIT_OR, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value | obj.value),
-            (TokenType.BIT_XOR, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value ^ obj.value),
-            (TokenType.BIT_LSHIFT, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value << obj.value),
-            (TokenType.BIT_RSHIFT, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value >> obj.value),
+            (Tt.PLUS, Tt.INTL): lambda: bv(Tt.INTL, int(self.value + obj.value)),
+            (Tt.MINUS, Tt.INTL): lambda: bv(Tt.INTL, int(self.value - obj.value)),
+            (Tt.MUL, Tt.INTL): lambda: bv(Tt.INTL, int(self.value * obj.value)),
+            (Tt.DIV, Tt.INTL): lambda: bv(Tt.INTL, int(self.value / obj.value)),
+            (Tt.MOD, Tt.INTL): lambda: bv(Tt.INTL, int(self.value % obj.value)),
+            (Tt.LOGICAL_AND, Tt.INTL): lambda: bv(Tt.INTL, int(self.value and obj.value)),
+            (Tt.LOGICAL_OR, Tt.INTL): lambda: bv(Tt.INTL, int(self.value or obj.value)),
+            (Tt.EQUAL, Tt.INTL): lambda: bv(Tt.INTL, int(self.value == obj.value)),
+            (Tt.NOT_EQUAL, Tt.INTL): lambda: bv(Tt.INTL, int(self.value != obj.value)),
+            (Tt.LESS, Tt.INTL): lambda: bv(Tt.INTL, int(self.value < obj.value)),
+            (Tt.GREATER, Tt.INTL): lambda: bv(Tt.INTL, int(self.value > obj.value)),
+            (Tt.LESS_EQUAL, Tt.INTL): lambda: bv(Tt.INTL, int(self.value <= obj.value)),
+            (Tt.GREATER_EQUAL, Tt.INTL): lambda: bv(Tt.INTL, int(self.value >= obj.value)),
+            (Tt.BIT_AND, Tt.INTL): lambda: bv(Tt.INTL, int(self.value & obj.value)),
+            (Tt.BIT_OR, Tt.INTL): lambda: bv(Tt.INTL, int(self.value | obj.value)),
+            (Tt.BIT_XOR, Tt.INTL): lambda: bv(Tt.INTL, int(self.value ^ obj.value)),
+            (Tt.BIT_LSHIFT, Tt.INTL): lambda: bv(Tt.INTL, int(self.value << obj.value)),
+            (Tt.BIT_RSHIFT, Tt.INTL): lambda: bv(Tt.INTL, int(self.value >> obj.value)),
 
-            (TokenType.PLUS, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value + obj.value),
-            (TokenType.MINUS, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value - obj.value),
-            (TokenType.MUL, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value * obj.value),
-            (TokenType.DIV, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value / obj.value),
-            (TokenType.LOGICAL_AND, TokenType.FLOATL): lambda: build_value(TokenType.INTL,
-                                                                           bool(self.value and obj.value)),
-            (TokenType.LOGICAL_OR, TokenType.FLOATL): lambda: build_value(TokenType.INTL,
-                                                                          bool(self.value or obj.value)),
-            (TokenType.EQUAL, TokenType.FLOATL): lambda: build_value(TokenType.INTL, bool(self.value == obj.value)),
-            (TokenType.NOT_EQUAL, TokenType.FLOATL): lambda: build_value(TokenType.INTL, bool(self.value != obj.value)),
-            (TokenType.LESS, TokenType.FLOATL): lambda: build_value(TokenType.INTL, bool(self.value < obj.value)),
-            (TokenType.GREATER, TokenType.FLOATL): lambda: build_value(TokenType.INTL, bool(self.value > obj.value)),
-            (TokenType.LESS_EQUAL, TokenType.FLOATL): lambda: build_value(TokenType.INTL,
-                                                                          bool(self.value <= obj.value)),
-            (TokenType.GREATER_EQUAL, TokenType.FLOATL): lambda: build_value(TokenType.INTL,
-                                                                             bool(self.value >= obj.value)),
+            (Tt.PLUS, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value + obj.value)),
+            (Tt.MINUS, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value - obj.value)),
+            (Tt.MUL, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value * obj.value)),
+            (Tt.DIV, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value / obj.value)),
+            (Tt.LOGICAL_AND, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value and obj.value)),
+            (Tt.LOGICAL_OR, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value or obj.value)),
+            (Tt.EQUAL, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value == obj.value)),
+            (Tt.NOT_EQUAL, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value != obj.value)),
+            (Tt.LESS, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value < obj.value)),
+            (Tt.GREATER, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value > obj.value)),
+            (Tt.LESS_EQUAL, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value <= obj.value)),
+            (Tt.GREATER_EQUAL, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value >= obj.value)),
         }
         return operations.get((operator, obj.type), None)
 
-    def unary_operator(self, operator):
+    def unary_operator(self, operator: TokenType) -> Optional[Callable]:
         operations = {
-            (TokenType.MINUS): lambda: build_value(TokenType.INTL, -self.value),
-            (TokenType.LOGICAL_NOT): lambda: build_value(TokenType.INTL, bool(not self.value)),
-            (TokenType.BIT_NOT): lambda: build_value(TokenType.INTL, ~self.value),
+            Tt.MINUS: lambda: bv(Tt.INTL, int(-self.value)),
+            Tt.LOGICAL_NOT: lambda: bv(Tt.INTL, int(not self.value)),
+            Tt.BIT_NOT: lambda: bv(Tt.INTL, int(~self.value)),
         }
-        return operations.get((operator), None)
+        return operations.get(operator, None)
 
-    def assignment_operator(self, operator, obj):
+    def assignment_operator(self, operator: TokenType, obj: Value) -> Optional[Callable]:
         operations = {
-            (TokenType.PLUS_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value + obj.value),
-            (TokenType.MINUS_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value - obj.value),
-            (TokenType.MUL_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value * obj.value),
-            (TokenType.DIV_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value / obj.value),
-            (TokenType.MOD_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value % obj.value),
-            (TokenType.BIT_AND_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value & obj.value),
-            (TokenType.BIT_OR_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value | obj.value),
-            (TokenType.BIT_XOR_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value ^ obj.value),
-            (TokenType.BIT_LSHIFT_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value << obj.value),
-            (TokenType.BIT_RSHIFT_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.INTL, self.value >> obj.value),
+            (Tt.PLUS_ASSIGN, Tt.INTL): lambda: bv(Tt.INTL, int(self.value + obj.value)),
+            (Tt.MINUS_ASSIGN, Tt.INTL): lambda: bv(Tt.INTL, int(self.value - obj.value)),
+            (Tt.MUL_ASSIGN, Tt.INTL): lambda: bv(Tt.INTL, int(self.value * obj.value)),
+            (Tt.DIV_ASSIGN, Tt.INTL): lambda: bv(Tt.INTL, int(self.value / obj.value)),
+            (Tt.MOD_ASSIGN, Tt.INTL): lambda: bv(Tt.INTL, int(self.value % obj.value)),
+            (Tt.BIT_AND_ASSIGN, Tt.INTL): lambda: bv(Tt.INTL, int(self.value & obj.value)),
+            (Tt.BIT_OR_ASSIGN, Tt.INTL): lambda: bv(Tt.INTL, int(self.value | obj.value)),
+            (Tt.BIT_XOR_ASSIGN, Tt.INTL): lambda: bv(Tt.INTL, int(self.value ^ obj.value)),
+            (Tt.BIT_LSHIFT_ASSIGN, Tt.INTL): lambda: bv(Tt.INTL, int(self.value << obj.value)),
+            (Tt.BIT_RSHIFT_ASSIGN, Tt.INTL): lambda: bv(Tt.INTL, int(self.value >> obj.value)),
 
-            (TokenType.PLUS_ASSIGN, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value + obj.value),
-            (TokenType.MINUS_ASSIGN, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value - obj.value),
-            (TokenType.MUL_ASSIGN, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value * obj.value),
-            (TokenType.DIV_ASSIGN, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value / obj.value),
-        }
-        return operations.get((operator, obj.type), None)
-
-    def cast_operator(self, operator):
-        operations = {
-            (TokenType.INT): lambda: build_value(TokenType.INTL, self.value),
-            (TokenType.FLOAT): lambda: build_value(TokenType.FLOATL, self.value),
-            (TokenType.STRING): lambda: build_value(TokenType.STRINGL, self.value),
-        }
-        return operations.get((operator), None)
-
-
-class Float(Value):
-    def binary_operator(self, operator, obj):
-        operations = {
-            (TokenType.PLUS, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value + obj.value),
-            (TokenType.MINUS, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value - obj.value),
-            (TokenType.MUL, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value * obj.value),
-            (TokenType.DIV, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value / obj.value),
-            (TokenType.LOGICAL_AND, TokenType.FLOATL): lambda: build_value(TokenType.INTL,
-                                                                           bool(self.value and obj.value)),
-            (TokenType.LOGICAL_OR, TokenType.FLOATL): lambda: build_value(TokenType.INTL,
-                                                                          bool(self.value or obj.value)),
-            (TokenType.EQUAL, TokenType.FLOATL): lambda: build_value(TokenType.INTL, bool(self.value == obj.value)),
-            (TokenType.NOT_EQUAL, TokenType.FLOATL): lambda: build_value(TokenType.INTL, bool(self.value != obj.value)),
-            (TokenType.LESS, TokenType.FLOATL): lambda: build_value(TokenType.INTL, bool(self.value < obj.value)),
-            (TokenType.GREATER, TokenType.FLOATL): lambda: build_value(TokenType.INTL, bool(self.value > obj.value)),
-            (TokenType.LESS_EQUAL, TokenType.FLOATL): lambda: build_value(TokenType.INTL,
-                                                                          bool(self.value <= obj.value)),
-            (TokenType.GREATER_EQUAL, TokenType.FLOATL): lambda: build_value(TokenType.INTL,
-                                                                             bool(self.value >= obj.value)),
-
-            (TokenType.PLUS, TokenType.INTL): lambda: build_value(TokenType.FLOATL, self.value + obj.value),
-            (TokenType.MINUS, TokenType.INTL): lambda: build_value(TokenType.FLOATL, self.value - obj.value),
-            (TokenType.MUL, TokenType.INTL): lambda: build_value(TokenType.FLOATL, self.value * obj.value),
-            (TokenType.DIV, TokenType.INTL): lambda: build_value(TokenType.FLOATL, self.value / obj.value),
-            (TokenType.LOGICAL_AND, TokenType.INTL): lambda: build_value(TokenType.INTL,
-                                                                         bool(self.value and obj.value)),
-            (TokenType.LOGICAL_OR, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value or obj.value)),
-            (TokenType.EQUAL, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value == obj.value)),
-            (TokenType.NOT_EQUAL, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value != obj.value)),
-            (TokenType.LESS, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value < obj.value)),
-            (TokenType.GREATER, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value > obj.value)),
-            (TokenType.LESS_EQUAL, TokenType.INTL): lambda: build_value(TokenType.INTL, bool(self.value <= obj.value)),
-            (TokenType.GREATER_EQUAL, TokenType.INTL): lambda: build_value(TokenType.INTL,
-                                                                           bool(self.value >= obj.value)),
+            (Tt.PLUS_ASSIGN, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value + obj.value)),
+            (Tt.MINUS_ASSIGN, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value - obj.value)),
+            (Tt.MUL_ASSIGN, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value * obj.value)),
+            (Tt.DIV_ASSIGN, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value / obj.value)),
         }
         return operations.get((operator, obj.type), None)
 
-    def unary_operator(self, operator):
+    def cast_operator(self, operator: TokenType) -> Optional[Callable]:
         operations = {
-            (TokenType.MINUS): lambda: build_value(TokenType.FLOATL, -self.value),
-            (TokenType.LOGICAL_NOT): lambda: build_value(
-                TokenType.INTL, bool(not self.value)),
+            Tt.INT: lambda: bv(Tt.INTL, int(self.value)),
+            Tt.FLOAT: lambda: bv(Tt.FLOATL, float(self.value)),
+            Tt.STRING: lambda: bv(Tt.STRINGL, str(self.value)),
         }
-        return operations.get((operator), None)
+        return operations.get(operator, None)
 
-    def assignment_operator(self, operator, obj):
+
+class FloatValue(Value):
+    def binary_operator(self, operator: TokenType, obj: Value) -> Optional[Callable]:
         operations = {
-            (TokenType.PLUS_ASSIGN, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value + obj.value),
-            (TokenType.MINUS_ASSIGN, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value - obj.value),
-            (TokenType.MUL_ASSIGN, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value * obj.value),
-            (TokenType.DIV_ASSIGN, TokenType.FLOATL): lambda: build_value(TokenType.FLOATL, self.value / obj.value),
+            (Tt.PLUS, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value + obj.value)),
+            (Tt.MINUS, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value - obj.value)),
+            (Tt.MUL, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value * obj.value)),
+            (Tt.DIV, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value / obj.value)),
+            (Tt.LOGICAL_AND, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value and obj.value)),
+            (Tt.LOGICAL_OR, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value or obj.value)),
+            (Tt.EQUAL, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value == obj.value)),
+            (Tt.NOT_EQUAL, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value != obj.value)),
+            (Tt.LESS, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value < obj.value)),
+            (Tt.GREATER, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value > obj.value)),
+            (Tt.LESS_EQUAL, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value <= obj.value)),
+            (Tt.GREATER_EQUAL, Tt.FLOATL): lambda: bv(Tt.INTL, int(self.value >= obj.value)),
 
-            (TokenType.PLUS_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.FLOATL, self.value + obj.value),
-            (TokenType.MINUS_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.FLOATL, self.value - obj.value),
-            (TokenType.MUL_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.FLOATL, self.value * obj.value),
-            (TokenType.DIV_ASSIGN, TokenType.INTL): lambda: build_value(TokenType.FLOATL, self.value / obj.value),
+            (Tt.PLUS, Tt.INTL): lambda: bv(Tt.FLOATL, float(self.value + obj.value)),
+            (Tt.MINUS, Tt.INTL): lambda: bv(Tt.FLOATL, float(self.value - obj.value)),
+            (Tt.MUL, Tt.INTL): lambda: bv(Tt.FLOATL, float(self.value * obj.value)),
+            (Tt.DIV, Tt.INTL): lambda: bv(Tt.FLOATL, float(self.value / obj.value)),
+            (Tt.LOGICAL_AND, Tt.INTL): lambda: bv(Tt.INTL, int(self.value and obj.value)),
+            (Tt.LOGICAL_OR, Tt.INTL): lambda: bv(Tt.INTL, int(self.value or obj.value)),
+            (Tt.EQUAL, Tt.INTL): lambda: bv(Tt.INTL, int(self.value == obj.value)),
+            (Tt.NOT_EQUAL, Tt.INTL): lambda: bv(Tt.INTL, int(self.value != obj.value)),
+            (Tt.LESS, Tt.INTL): lambda: bv(Tt.INTL, int(self.value < obj.value)),
+            (Tt.GREATER, Tt.INTL): lambda: bv(Tt.INTL, int(self.value > obj.value)),
+            (Tt.LESS_EQUAL, Tt.INTL): lambda: bv(Tt.INTL, int(self.value <= obj.value)),
+            (Tt.GREATER_EQUAL, Tt.INTL): lambda: bv(Tt.INTL, int(self.value >= obj.value)),
         }
         return operations.get((operator, obj.type), None)
 
-    def cast_operator(self, operator):
+    def unary_operator(self, operator: TokenType) -> Optional[Callable]:
         operations = {
-            (TokenType.INT): lambda: build_value(TokenType.INTL, self.value),
-            (TokenType.FLOAT): lambda: build_value(TokenType.FLOATL, self.value),
-            (TokenType.STRING): lambda: build_value(TokenType.STRINGL, self.value),
+            Tt.MINUS: lambda: bv(Tt.FLOATL, float(-self.value)),
+            Tt.LOGICAL_NOT: lambda: bv(Tt.INTL, int(not self.value)),
         }
-        return operations.get((operator), None)
+        return operations.get(operator, None)
+
+    def assignment_operator(self, operator: TokenType, obj: Value) -> Optional[Callable]:
+        operations = {
+            (Tt.PLUS_ASSIGN, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value + obj.value)),
+            (Tt.MINUS_ASSIGN, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value - obj.value)),
+            (Tt.MUL_ASSIGN, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value * obj.value)),
+            (Tt.DIV_ASSIGN, Tt.FLOATL): lambda: bv(Tt.FLOATL, float(self.value / obj.value)),
+
+            (Tt.PLUS_ASSIGN, Tt.INTL): lambda: bv(Tt.FLOATL, float(self.value + obj.value)),
+            (Tt.MINUS_ASSIGN, Tt.INTL): lambda: bv(Tt.FLOATL, float(self.value - obj.value)),
+            (Tt.MUL_ASSIGN, Tt.INTL): lambda: bv(Tt.FLOATL, float(self.value * obj.value)),
+            (Tt.DIV_ASSIGN, Tt.INTL): lambda: bv(Tt.FLOATL, float(self.value / obj.value)),
+        }
+        return operations.get((operator, obj.type), None)
+
+    def cast_operator(self, operator: TokenType) -> Optional[Callable]:
+        operations = {
+            Tt.INT: lambda: bv(Tt.INTL, int(self.value)),
+            Tt.FLOAT: lambda: bv(Tt.FLOATL, float(self.value)),
+            Tt.STRING: lambda: bv(Tt.STRINGL, str(self.value)),
+        }
+        return operations.get(operator, None)
 
 
-class String(Value):
+class StringValue(Value):
     default = ""
 
-    def binary_operator(self, operator, obj):
+    def binary_operator(self, operator: TokenType, obj: Value) -> Optional[Callable]:
         operations = {
-            (TokenType.PLUS, TokenType.STRINGL): lambda: build_value(TokenType.STRINGL, self.value + obj.value),
-            (TokenType.EQUAL, TokenType.STRINGL): lambda: build_value(TokenType.INTL, bool(self.value == obj.value)),
-            (TokenType.NOT_EQUAL, TokenType.STRINGL): lambda: build_value(TokenType.INTL,
-                                                                          bool(self.value != obj.value)),
+            (Tt.PLUS, Tt.STRINGL): lambda: bv(Tt.STRINGL, str(self.value + obj.value)),
+            (Tt.EQUAL, Tt.STRINGL): lambda: bv(Tt.INTL, int(self.value == obj.value)),
+            (Tt.NOT_EQUAL, Tt.STRINGL): lambda: bv(Tt.INTL, int(self.value != obj.value)),
         }
         return operations.get((operator, obj.type), None)
 
-    def assignment_operator(self, operator, obj):
+    def assignment_operator(self, operator: TokenType, obj: Value) -> Optional[Callable]:
         operations = {
-            (TokenType.PLUS_ASSIGN, TokenType.STRINGL): lambda: build_value(TokenType.STRINGL, self.value + obj.value),
+            (Tt.PLUS_ASSIGN, Tt.STRINGL): lambda: bv(Tt.STRINGL, str(self.value + obj.value)),
         }
         return operations.get((operator, obj.type), None)
 
-    def cast_operator(self, operator):
+    def cast_operator(self, operator: TokenType) -> Optional[Callable]:
         operations = {
-            (TokenType.INT): lambda: build_value(TokenType.INTL, self.value),
-            (TokenType.FLOAT): lambda: build_value(TokenType.FLOATL, self.value),
-            (TokenType.STRING): lambda: build_value(TokenType.STRINGL, self.value),
+            Tt.INT: lambda: bv(Tt.INTL, int(self.value)),
+            Tt.FLOAT: lambda: bv(Tt.FLOATL, float(self.value)),
+            Tt.STRING: lambda: bv(Tt.STRINGL, str(self.value)),
         }
-        return operations.get((operator), None)
+        return operations.get(operator, None)
 
 
-class List(object):
-    """
-    TODO: change
-    """
+class InitializerListValue(Value):
+    pass
 
-    def __init__(self, value):
-        self.value = value
 
-        curr = value
-        while isinstance(curr, List):
-            if len(curr.value) == 0:
-                raise TypeError()
-            curr = curr.value[0]
-        self.type = curr.type
-
-        def verify(obj):
-            if len(obj) == 0:
-                raise TypeError()
-            if all(isinstance(element, List) for element in obj):
-                for element in obj:
-                    verify(element.value)
-            elif not all(isinstance(element, Value) and element.type == self.type for element in obj):
-                raise TypeError()
-
-        verify(self.value)
-
-    @staticmethod
-    def from_dimensions(_type: TokenType, dimensions: list[int]):
-        for d in dimensions:
-            if d <= 0:
-                raise TypeError()
-
-        def generate(index):
-            if index == len(dimensions):
-                return build_value(_type)
-            return List([generate(index + 1) for _ in range(dimensions[index + 1])])
-
-        return generate(0)
-
-    def access(self, indices: list[int]):
-        curr = self.value
-        for i in indices:
-            curr = curr[i].value
-        return curr
-
-    def assign(self, indices: list[int], obj, operator: TokenType):
-        curr = self.value
-        for i in range(len(indices) - 1):
-            curr = curr[indices[i]].value
-        if operator == TokenType.ASSIGN:
-            def assign_and_verify(old, new):
-                if len(old) != len(new):
-                    raise TypeError()
-                for i in range(len(old)):
-                    if isinstance(old[i], List) and isinstance(new[i], List):
-                        assign_and_verify(old[i], new[i])
-                    elif isinstance(new[i], Value) and new[i].type == self.type:
-                        old[i] = new[i]
-                    else:
-                        raise TypeError()
-
-            assign_and_verify(curr[indices[-1]], obj)
-
-        else:
-            if isinstance(curr[indices[-1]], List):
-                return False
-            value = curr[indices[-1]].assignment_operator(operator, obj)
-            if value is None:
-                return False
-            curr[indices[-1]] = value()
+class NullValue(Value):
+    pass
 
 
 class Function(object):
@@ -360,11 +305,12 @@ class Function(object):
 
     Attributes:
         type (TokenType): the type of the function.
-        args (list): the list of args.
-        block (AST): the main body of the function.
+        args (List[Union[FunctionArgument]]): the list of args.
+        block (Union[BuiltInFunctionCallStatementNode, BlockStatementNode]): the main body of the function.
     """
 
-    def __init__(self, _type: TokenType, args: list, block: AST):
-        self.type = _type
+    def __init__(self, token_type: TokenType, args: List[Union[FunctionArgument]],
+                 block: Union[BuiltInFunctionCallStatementNode, BlockStatementNode]) -> None:
+        self.type = token_type
         self.args = args
         self.block = block

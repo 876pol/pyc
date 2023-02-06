@@ -2,19 +2,22 @@
     Tic-Tac-Toe game written in pyc.
 */
 
+string grid[3][3] = {{" ", " ", " "}, {" ", " ", " "}, {" ", " ", " "}};
+
 // Function that prints the Tic-Tac-Toe grid.
-void print_grid(list grid) {
+void print_grid() {
     for (int i = 0; i < 3; i += 1) {
-        string to_print = "|";
+    	print("|");
         for (int j = 0; j < 3; j += 1) {
-            to_print += (string) grid[i][j] + "|";
+            print((string) grid[i][j] + "|");
         }
-        prints(to_print);
+        print("\n");
     }
+    print("\n");
 }
 
 // Function that checks if a player has won.
-int gameover(list grid) {
+int gameover() {
     // Check diagonals.
     if ((grid[0][0] == grid[1][1] && grid[1][1] == grid[2][2] && grid[0][0] != " ") ||
         (grid[2][0] == grid[1][1] && grid[1][1] == grid[0][2] && grid[2][0] != " ")) {
@@ -22,7 +25,7 @@ int gameover(list grid) {
     }
     // Check horizontal and vertical lines.
     for (int i = 0; i < 3; i += 1) {
-        if ((grid[i][0] == grid[i][1] && grid[i][1] == grid[i][2] && grid[i][0] != " ") || 
+        if ((grid[i][0] == grid[i][1] && grid[i][1] == grid[i][2] && grid[i][0] != " ") ||
             (grid[0][i] == grid[1][i] && grid[1][i] == grid[2][i] && grid[0][i] != " ")) {
             return 1;
         }
@@ -32,29 +35,26 @@ int gameover(list grid) {
 
 // Main function.
 int main() {
-    list grid = [[" ", " ", " "], // Tic-Tac-Toe board.
-                [" ", " ", " "], 
-                [" ", " ", " "]];
     int turn = 1; // The current player's turn.
 
     for (int i = 0; i < 9; i += 1) {
         // Prints messages
-        print_grid(grid);
-        prints("It is Player " + (string) turn + "'s turn");
-        prints("Where do you want to place your token? Type a number from 1 to 9.");
+        print_grid();
+        print("It is Player " + (string) turn + "'s turn\n");
+        print("Where do you want to place your token? Type a number from 1 to 9.\n");
 
         // Gets user input and validates it.
         int is_valid = 1;
         int choice = 0;
         do {
             is_valid = 1;
-            choice = inputi() - 1;
+            choice = (int) scan() - 1;
             if (choice < 0 || choice > 8) {
                 is_valid = 0;
-                prints("Invalid Input.");
+                print("Invalid Input.\n");
             } else if (grid[choice / 3][choice % 3] != " ") {
                 is_valid = 0;
-                prints("Invalid Input.");
+                print("Invalid Input.\n");
             }
         } while (!is_valid);
 
@@ -66,9 +66,9 @@ int main() {
         }
 
         // Check if the player has won.
-        if (gameover(grid)) {
-            print_grid(grid);
-            prints("Player " + (string) turn + " wins!");
+        if (gameover()) {
+            print_grid();
+            print("Player " + (string) turn + " wins!\n");
             return 0;
         }
 
@@ -77,8 +77,8 @@ int main() {
     }
 
     // If no one has won after nine moves, the game has tied.
-    print_grid(grid);
-    prints("Tie!");
+    print_grid();
+    print("Tie!\n");
 
     return 0;
 }

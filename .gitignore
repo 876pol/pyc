@@ -1,9 +1,10 @@
 __pycache__/
-interpreter/__pycache__
-.replit
-.vscode
-poetry.lock
-pyproject.toml
-.breakpoints
+_trial_temp/
 out/
 .idea/
+.replit
+.vscode
+.breakpoints
+poetry.lock
+pyproject.toml
+/examples/main.pysc

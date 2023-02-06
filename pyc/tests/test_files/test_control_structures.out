@@ -1,0 +1,36 @@
+01234
+024
+13579
+01234
+024
+13579
+-2416
+outer
+1 0
+inner
+outer
+2 0
+inner
+2 1
+inner
+outer
+3 0
+inner
+3 1
+inner
+3 2
+inner
+outer
+4 0
+inner
+4 1
+inner
+4 2
+inner
+4 3
+inner
+outer
+outside
+a < 2
+2 <= a < 5
+5 <= a

@@ -6,15 +6,15 @@ This file holds all the standard library functions that are implemented in the i
 
 import sys
 
-from pyc_ast import FunctionArgument
-from error import ReturnException
-from tokens import Token, TokenType
+from ast_nodes import FunctionArgument
+from control_exceptions import ReturnException
+from tokens import TokenType
 from value import build_value
 
 
 class LibraryFunction(object):
     """
-    Class that represents a builtin function.
+    Class that represents a built-in function.
 
     Attributes:
         name (str): the name of the function.
@@ -25,6 +25,7 @@ class LibraryFunction(object):
     type = None
     args = None
 
+    @staticmethod
     def run(scopes):
         """The function body."""
         pass
@@ -34,10 +35,12 @@ class Print(LibraryFunction):
     """Library function that allows for printing a string (other datatypes can be printed through casting)."""
     name = "print"
     type = TokenType.VOID
-    args = [FunctionArgument(TokenType.STRING, Token(TokenType.TYPE, "p"))]
+    args = [FunctionArgument(TokenType.STRING, "p")]
 
+    @staticmethod
     def run(scopes):
-        print(scopes.get("p").value)
+        print(bytes(scopes.get("p").value, "utf-8").decode("unicode_escape"), end="")
+        raise ReturnException(build_value(TokenType.VOIDL))
 
 
 def next_token():
@@ -77,6 +80,7 @@ class Scan(LibraryFunction):
     type = TokenType.STRING
     args = []
 
+    @staticmethod
     def run(scopes):
         raise ReturnException(build_value(TokenType.STRINGL, next_token()))
 
@@ -86,6 +90,7 @@ class GetLine(LibraryFunction):
     type = TokenType.STRING
     args = []
 
+    @staticmethod
     def run(scopes):
         raise ReturnException(build_value(TokenType.STRINGL, next_line()))
 

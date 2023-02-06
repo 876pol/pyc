@@ -1,0 +1,23 @@
+/*
+    This file contains code for automated testing of IO in pyc.
+*/
+
+int main() {
+    // input
+    int a = (int) scan();
+    int b = (int) scan();
+    float c = (float) scan();
+    string s = getline();
+    string t = getline();
+
+    // output
+    print((string) a + "\n");
+    print((string) b + "\n");
+    print((string) c + "\n");
+    print(s + " ");
+    print(t + "\n");
+
+    // random semicolons
+    ;;;
+    return 0;
+}

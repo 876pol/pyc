@@ -1,10 +1,18 @@
 int main() {
+    int a[5][5];
     for (int i = 0; i < 5; i += 1) {
-        printi(i);   
+        for (int j = 0; j < 5; j += 1) {
+            a[i][j] = i * 5 + j;
+        }
     }
     int i = 4;
     while (i >= 0) {
-        printi(i);
+        int j = 4;
+        while (j >= 0) {
+            print((string) a[i][j] + " ");
+            j -= 1;
+        }
+        print("\n");
         i -= 1;
     }
     return 0;
