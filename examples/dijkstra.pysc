@@ -1,0 +1,179 @@
+/*
+    Implementation of Dijkstra's algorithm in pyc.
+*/
+
+int INF = 5000000000;
+
+// Function that takes in two numbers, and returns the minimum of the two.
+int min(int a, int b) {
+    if (a < b) {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+// Function that takes in two integer arrays of length 2 and swaps them.
+void swap(int a[2], int b[2]) {
+    int t[2] = {
+        a[0],
+        a[1]
+    };
+    a[0] = b[0];
+    a[1] = b[1];
+    b[0] = t[0];
+    b[1] = t[1];
+}
+
+// Function that inserts an element into a min heap. Each element is a pair of integers.
+void heap_insert(int heap[][2], int end, int element[2]) {
+    // Inserts the element at the bottom of the heap.
+    int curr = end;
+    heap[curr][0] = element[0];
+    heap[curr][1] = element[1];
+
+    // Fixes any violations of the heap property.
+    while (curr != 1 && heap[curr / 2][0] > heap[curr][0]) {
+        swap(heap[curr], heap[curr / 2]);
+        curr /= 2;
+    }
+}
+
+// Function that removes the smallest element from a min heap.
+void heap_remove_min(int heap[][2], int end) {
+    // Remove the minimum element in the heap, and replace it with the last element.
+    heap[1][0] = INF;
+    heap[1][1] = INF;
+    swap(heap[1], heap[end - 1]);
+
+    // Fixes any violations of the heap property.
+    int curr = 1;
+    end -= 1;
+    int smallest;
+    do {
+        smallest = curr;
+        if (curr * 2 < end) {
+            if (heap[curr * 2][0] < heap[smallest][0]) {
+                smallest = curr * 2;
+            }
+        }
+        if (curr * 2 + 1 < end) {
+            if (heap[curr * 2 + 1][0] < heap[smallest][0]) {
+                smallest = curr * 2 + 1;
+            }
+        }
+        swap(heap[curr], heap[smallest]);
+        curr = smallest;
+    } while (smallest != curr);
+}
+
+// Main function.
+int main() {
+    print("Number of nodes > ");
+    int n = (int) scan();
+    print("Number of edges > ");
+    int m = (int) scan();
+
+    // Initialize adjacency matrix representation of graph.
+    int graph[n][n];
+    for (int i = 0; i < n; i += 1) {
+        for (int j = 0; j < n; j += 1) {
+            graph[i][j] = INF;
+        }
+    }
+
+    // Inserts each edge into the adjacency matrix. If there are multi-edges, take the edge with the minimum weight.
+    for (int i = 1; i <= m; i += 1) {
+        print("Edge #" + (string) i + " > ");
+        int a = (int) scan();
+        int b = (int) scan();
+        int w = (int) scan();
+        graph[a][b] = min(graph[a][b], w);
+    }
+
+    print("Start node > ");
+    int s = (int) scan();
+    print("End node > ");
+    int e = (int) scan();
+
+    // Create empty heap.
+    int heap[m + 2][2];
+    for (int i = 0; i <= m; i += 1) {
+        heap[i][0] = INF;
+        heap[i][1] = INF;
+    }
+
+    // Initialize other arrays.
+    int dist[n]; // Distance from start node.
+    for (int i = 0; i < n; i += 1) dist[i] = INF;
+    int from[n]; // if from[j] == i, dist[j] = dist[i] + graph[i][j].
+    for (int i = 0; i < n; i += 1) from[i] = -1;
+    int visited[n]; // Whether a node has already been visited.
+
+    // Insert start node into heap.
+    int end = 1; // Heap is one-indexed, and `end` represents the lowest empty index of the heap.
+    heap_insert(heap, end, {
+        0,
+        s
+    });
+    end += 1;
+
+    // Distance of start node is 0.
+    dist[s] = 0;
+
+    // Keeps running until there are no nodes left in the heap.
+    while (end != 1) {
+        // Reads the smallest element in the heap, and pops it out.
+        int curr_dist = heap[1][0];
+        int node = heap[1][1];
+        heap_remove_min(heap, end);
+        end -= 1;
+
+        if (visited[node]) continue;
+        visited[node] = 1;
+
+        // Iterates through all the edges originating at `node`.
+        for (int i = 0; i < n; i += 1) {
+            if (graph[node][i] == INF) continue;
+
+            // Inserts the path from `s` to `i` into the graph.
+            heap_insert(heap, end, {
+                curr_dist + graph[node][i],
+                i
+            });
+            end += 1;
+
+            // If this path is smaller than `dist[i]`, update the `dist` and `from` arrays accordingly.
+            if (dist[i] > curr_dist + graph[node][i]) {
+                dist[i] = curr_dist + graph[node][i];
+                from[i] = node;
+            }
+        }
+    }
+
+    if (dist[e] == INF) {
+        print("No path was found.\n");
+        return 0;
+    }
+
+    // Holds the shortest path from `s` to `e`.
+    int path[n];
+
+    // Builds the path array according to `from`.
+    // from[from[...from[e]...]] will eventually give you the shortest path between `s` and `e`.
+    int curr = e;
+    int path_idx = 0;
+    while (curr != -1) {
+        path[path_idx] = curr;
+        path_idx += 1;
+        curr = from[curr];
+    }
+
+    print("Minimum distance: " + (string) dist[e] + "\n");
+    print("Best path: ");
+    for (int i = path_idx - 1; i > 0; i -= 1) {
+        print("(" + (string) path[i] + ") -> ");
+    }
+    print("(" + (string) path[0] + ")\n");
+    return 0;
+}

@@ -38,8 +38,8 @@ class Print(LibraryFunction):
     args = [FunctionArgument(TokenType.STRING, "p")]
 
     @staticmethod
-    def run(scopes):
-        print(bytes(scopes.get("p").value, "utf-8").decode("unicode_escape"), end="")
+    def run(stack):
+        print(bytes(stack.get("p").value, "utf-8").decode("unicode_escape"), end="")
         raise ReturnException(build_value(TokenType.VOIDL))
 
 
@@ -81,7 +81,7 @@ class Scan(LibraryFunction):
     args = []
 
     @staticmethod
-    def run(scopes):
+    def run(stack):
         raise ReturnException(build_value(TokenType.STRINGL, next_token()))
 
 
@@ -91,7 +91,7 @@ class GetLine(LibraryFunction):
     args = []
 
     @staticmethod
-    def run(scopes):
+    def run(stack):
         raise ReturnException(build_value(TokenType.STRINGL, next_line()))
 
 

@@ -2,8 +2,8 @@ int main() {
     int i = (int) scan();
     float f = (float) scan();
     string s = scan();
-    print("You inputed " + (string) i + "\n");
-    print("You inputed " + (string) f + "\n");
-    print("You inputed " + s + "\n");
+    print("You inputted " + (string) i + "\n");
+    print("You inputted " + (string) f + "\n");
+    print("You inputted " + s + "\n");
     return 0;
 }
