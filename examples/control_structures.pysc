@@ -1,0 +1,35 @@
+int main() {
+    // if statement example
+    print("What is the temperature today? > ");
+    float temperature = (float) scan();
+    if (temperature < 12.0) {
+        print("Wear a winter jacket\n");
+    } else if (temperature < 18.0) {
+        print("Wear a sweater\n");
+    } else {
+        print("Wear a T-shirt\n");
+    }
+    print("\n");
+
+    // for loop example
+    int arr[5][5];
+    for (int i = 0; i < 5; i += 1) {
+        for (int j = 0; j < 5; j += 1) {
+            arr[i][j] = i * 5 + j;
+        }
+    }
+
+    // while loop example
+    int i = 0;
+    while (i < 5) {
+        int j = 0;
+        while (j < 5) {
+            print((string) arr[i][j] + " ");
+            j += 1;
+        }
+        print("\n");
+        i += 1;
+    }
+
+    return 0;
+}

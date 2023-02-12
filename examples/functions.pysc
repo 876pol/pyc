@@ -1,4 +1,25 @@
-// Computes the ith fibonacci number.
+// Function that finds the square of an integer. Example of function parameters and returns.
+int square(int x) {
+    print("`square` received " + (string) x + " as a parameter.\n");
+    return x * x;
+}
+
+// Example of nested function calls.
+void a() {
+    print("In function `a`.\n");
+}
+
+void b() {
+    print("In function `b`.\n");
+    a();
+}
+
+void c() {
+    print("In function `c`.\n");
+    b();
+}
+
+// Computes the i-th fibonacci number. Example of recursion.
 int fib(int n) {
     if (n <= 1) {
         return n;
@@ -7,7 +28,12 @@ int fib(int n) {
 }
 
 int main() {
-    int n = (int) scan();
-    print((string) fib(n));
+    int res = square(5);
+    print("`square(5)` returned " + (string) res + ".\n\n");
+
+    c();
+    print("\n");
+
+    print("`fib(10)` = " + (string) fib(10));
     return 0;
 }
