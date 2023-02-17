@@ -2,11 +2,11 @@ int main() {
     // Input is performed through the `scan` function, while output is performed through the `print` function.
     print("What's your favourite colour? > ");
     string favourite_colour = scan();
-    print("Your favourite colour is " + favourite_colour + "\n\n");
+    print("Your favourite colour is " + favourite_colour + ".\n\n");
 
     // Type casting is necessary for the input and output of non-string data types.
     print("What's your favourite number? > ");
     int favourite_number = (int) scan();
-    print("Your favourite number is " + (string) favourite_number + "\n");
+    print("Your favourite number is " + (string) favourite_number + ".\n");
     return 0;
 }
