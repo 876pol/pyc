@@ -1,0 +1,21 @@
+float gf = 8.0;
+
+void modify() {
+    gf -= 20;
+}
+
+int main() {
+    float f = 4.0 * 12 / 2.4;
+
+    print((string) f + "\n");
+
+    f += 4;
+
+    print((string) f + "\n");
+
+    float gf = (float) "95.0";
+
+    print((string) gf + "\n");
+
+    return 0;
+}

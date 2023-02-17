@@ -37,18 +37,46 @@ class TestInterpreter(unittest.TestCase):
             "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_io.out",
             0)
 
-    def test_variables_expressions(self):
+    def test_int(self):
         self.feed_input_and_output_file(
-            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_variables_expressions.pysc",
-            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_variables_expressions.in",
-            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_variables_expressions.out",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_int.pysc",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_int.in",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_int.out",
             0)
 
-    def test_control_structures(self):
+    def test_float(self):
         self.feed_input_and_output_file(
-            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_control_structures.pysc",
-            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_control_structures.in",
-            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_control_structures.out",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_float.pysc",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_float.in",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_float.out",
+            0)
+
+    def test_string(self):
+        self.feed_input_and_output_file(
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_string.pysc",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_string.in",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_string.out",
+            0)
+
+    def test_if_statements(self):
+        self.feed_input_and_output_file(
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_if_statements.pysc",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_if_statements.in",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_if_statements.out",
+            0)
+
+    def test_for_loops(self):
+        self.feed_input_and_output_file(
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_for_loops.pysc",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_for_loops.in",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_for_loops.out",
+            0)
+
+    def test_while_loops(self):
+        self.feed_input_and_output_file(
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_while_loops.pysc",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_while_loops.in",
+            "C:\\Users\\paulc\\Code\\pyc\\pyc\\tests\\test_files\\test_while_loops.out",
             0)
 
     def test_functions(self):
@@ -61,4 +89,3 @@ class TestInterpreter(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

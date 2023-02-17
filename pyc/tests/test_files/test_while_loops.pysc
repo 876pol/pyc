@@ -1,0 +1,36 @@
+int main() {
+    int i = 0;
+    while (i < 5) {
+        print((string) i);
+        i += 1;
+    }
+    print("\n");
+
+    i = 0;
+    while (i < 10) {
+        if (i == 6) break;
+        print((string) i);
+        i += 2;
+    }
+    print("\n");
+
+    i = 0;
+    while (i < 10) {
+        if (i % 2 == 0) {
+            i += 1;
+            continue;
+        }
+        print((string) i);
+        i += 1;
+    }
+    print("\n");
+
+    i = 1;
+    do {
+        i *= -2;
+        if (i == -8) continue;
+        print((string) i);
+    } while (i != 16);
+    print("\n");
+    return 0;
+}

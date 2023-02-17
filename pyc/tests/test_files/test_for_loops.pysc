@@ -1,0 +1,31 @@
+int main() {
+    for (int i = 0; i < 5; i += 1) print((string) i);
+    print("\n");
+
+    for (int i = 0; i < 10; i += 2) {
+        if (i == 6) break;
+        print((string) i);
+    }
+    print("\n");
+
+    for (int i = 0; i < 10; i += 1) {
+        if (i % 2 == 0) continue;
+        print((string) i);
+    }
+    print("\n");
+    string s = "outside";
+    for (int i = 0; i < 5; i += 1) {
+        string s = "outer";
+        for (int j = 0; j < i; j += 1) {
+            string s = "";
+            print((string) i + " " + (string) j + "\n");
+            {
+                s = "inner";
+                print(s + "\n");
+            }
+        }
+        print(s + "\n");
+    }
+    print(s + "\n");
+    return 0;
+}

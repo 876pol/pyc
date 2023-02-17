@@ -1,0 +1,27 @@
+int main() {
+    int a = -1;
+    if (a < 2)
+        print("a < 2\n");
+    else if (a < 5)
+        print("2 <= a < 5\n");
+    else
+        print("5 <= a\n");
+
+    a = 3;
+    if (a < 2) {
+        print("a < 2\n");
+    } else if (a < 5) {
+        print("2 <= a < 5\n");
+    } else {
+        print("5 <= a\n");
+    }
+    a = 100;
+    if (a < 2) {
+        print("a < 2\n");
+    } else if (a < 5) {
+        print("2 <= a < 5\n");
+    } else {
+        print("5 <= a\n");
+    }
+    return 0;
+}

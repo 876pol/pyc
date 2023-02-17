@@ -1,10 +1,6 @@
 01234
 024
 13579
-01234
-024
-13579
--2416
 outer
 1 0
 inner
@@ -31,6 +27,3 @@ inner
 inner
 outer
 outside
-a < 2
-2 <= a < 5
-5 <= a

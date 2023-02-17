@@ -1,0 +1,55 @@
+int gi = 10;
+
+void modify() {
+    gi += 15;
+}
+
+int main() {
+    int i = (1 << (4 * 2 / 3)) % 9;
+
+    print((string) i + "\n");
+
+    i *= 3;
+
+    print((string) i + "\n");
+
+    int arr[][] = {{1, 2, 3, 4, 5}, {2, 2, 2, 2, 2}, {4, 3, 2, 1, 0}, {0, 0, 0, 0, 0}, {-100, -99, -98, -97, -96}};
+    print((string) arr[0][0] + "\n");
+    print((string) arr[4][4] + "\n");
+    print((string) (arr[2][3] + arr[1][1]) + "\n");
+
+    arr[0][0] *= 2;
+    arr[4][4] -= arr[2][3];
+
+    print((string) arr[0][0] + "\n");
+    print((string) arr[4][4] + "\n");
+    print((string) (arr[2][3] + arr[1][1]) + "\n");
+
+    print((string) gi + "\n");
+
+    modify();
+
+    print((string) gi + "\n");
+
+    int gi = 123;
+
+    print((string) gi + "\n");
+
+    int a[10][10];
+    for (int i = 0; i < 10; i += 1) {
+        for (int j = 0; j < 10; j += 1) {
+            a[i][j] = i * 10 + j;
+        }
+    }
+    for (int i = 0; i < 10; i += 1) {
+        for (int j = 0; j < 10; j += 1) {
+            print((string) a[i][j]);
+            if (j != 9) {
+                print(" ");
+            }
+        }
+        print("\n");
+    }
+
+    return 0;
+}
