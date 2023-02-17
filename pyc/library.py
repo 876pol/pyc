@@ -39,7 +39,7 @@ class Print(LibraryFunction):
 
     @staticmethod
     def run(stack):
-        print(bytes(stack.get("p").value, "utf-8").decode("unicode_escape"), end="")
+        print(bytes(stack.get("p").value, "utf-8").decode("unicode_escape"), end="", flush=True)
         raise ReturnException(build_value(TokenType.VOIDL))
 
 
