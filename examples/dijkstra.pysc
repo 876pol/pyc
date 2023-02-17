@@ -15,17 +15,15 @@ int min(int a, int b) {
 
 // Function that takes in two integer arrays of length 2 and swaps them.
 void swap(int a[2], int b[2]) {
-    int t[2] = {
-        a[0],
-        a[1]
-    };
+    int t[2] = {a[0], a[1]};
     a[0] = b[0];
     a[1] = b[1];
     b[0] = t[0];
     b[1] = t[1];
 }
 
-// Function that inserts an element into a min heap. Each element is a pair of integers.
+// Function that inserts an element into a min heap. Each element is a pair of integers. Arrays in pyc are
+// pass-by-reference, so `heap` is passed in as a parameter.
 void heap_insert(int heap[][2], int end, int element[2]) {
     // Inserts the element at the bottom of the heap.
     int curr = end;

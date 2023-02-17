@@ -1,9 +1,3 @@
-// Function that finds the square of an integer. Example of function parameters and returns.
-int square(int x) {
-    print("`square` received " + (string) x + " as a parameter.\n");
-    return x * x;
-}
-
 // Example of nested function calls.
 void a() {
     print("In function `a`.\n");
@@ -28,9 +22,6 @@ int fib(int n) {
 }
 
 int main() {
-    int res = square(5);
-    print("`square(5)` returned " + (string) res + ".\n\n");
-
     c();
     print("\n");
 

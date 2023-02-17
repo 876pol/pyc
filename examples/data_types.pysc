@@ -1,37 +1,30 @@
 int main() {
     // There are three basic data types: integers, floats, and strings.
-    int int_var = (2 + 5) * 3 - 4;
-    float float_var = 5.0 / 2 + 0.4;
-    string string_var = "Hello" + " " + "World";
+    int value_1 = (2 + 5) * 3 - 4;
+    float value_2 = 5.0 / 2 + 0.4;
+    string value_3 = "Hello" + " " + "World";
 
-    print((string) int_var + "\n");
-    print((string) float_var + "\n");
-    print(string_var + "\n");
+    print((string) value_1 + "\n");
+    print((string) value_2 + "\n");
+    print(value_3 + "\n");
 
-    // 1-D and multidimensional arrays are also supported.
-    int arr_default_values[3]; // default value for an integer array is 0.
-    string arr_assigned_values[] = {"this", "is", "an", "array"};
-    int multidim_arr[][] = {{1, 2}, {3, 4}};
+    // Arrays are also supported.
+    int arr_1[3]; // Arrays can be set to default values. The default value for an integer array is 0.
+    string arr_2[] = {"this", "is", "an", "array"}; // You can also manually specify each element.
+    int arr_3[][] = {{1, 2}, {3, 4}}; // The above two methods also work for multidimensional arrays.
 
-    // Data in arrays can be manipulated as usual.
-    arr_default_values[1] = 1;
-    arr_default_values[2] = 2;
-    arr_assigned_values[0] = "This";
-    arr_assigned_values[3] += "!";
+    // Array elements can be manipulated like normal variables.
+    arr_1[1] = 1;
+    arr_1[2] = 2;
+    arr_2[0] = "This";
+    arr_2[3] += "!";
 
-    print((string) arr_default_values[0] + " ");
-    print((string) arr_default_values[1] + " ");
-    print((string) arr_default_values[2] + "\n");
-
-    print((string) arr_assigned_values[0] + " ");
-    print((string) arr_assigned_values[1] + " ");
-    print((string) arr_assigned_values[2] + " ");
-    print((string) arr_assigned_values[3] + "\n");
-
-    print((string) multidim_arr[0][0] + " ");
-    print((string) multidim_arr[0][1] + "\n");
-    print((string) multidim_arr[1][0] + " ");
-    print((string) multidim_arr[1][1] + "\n");
+    print((string) arr_1[0] + " " + (string) arr_1[1] + " " + (string) arr_1[2] + "\n");
+    print((string) arr_2[0] + " " + (string) arr_2[1] + " " + (string) arr_2[2] + " " + (string) arr_2[3] + "\n");
+    print(
+        (string) arr_3[0][0] + " " + (string) arr_3[0][1] + "\n" +
+        (string) arr_3[1][0] + " " + (string) arr_3[1][1] + "\n"
+    );
 
     return 0;
 }

@@ -1,35 +1,15 @@
 int main() {
-    // if statement example
-    print("What is the temperature today? > ");
-    float temperature = (float) scan();
-    if (temperature < 12.0) {
-        print("Wear a winter jacket\n");
-    } else if (temperature < 18.0) {
-        print("Wear a sweater\n");
-    } else {
-        print("Wear a T-shirt\n");
-    }
-    print("\n");
-
-    // for loop example
-    int arr[5][5];
-    for (int i = 0; i < 5; i += 1) {
-        for (int j = 0; j < 5; j += 1) {
-            arr[i][j] = i * 5 + j;
+    // Plays FizzBuzz for integers up to 20. Example of control structures.
+    for (int i = 0; i < 20; i += 1) {
+        if (i % 15 == 0) {
+            print("FizzBuzz\n");
+        } else if (i % 5 == 0) {
+            print("Buzz\n");
+        } else if (i % 3 == 0) {
+            print("Fizz\n");
+        } else {
+            print((string) i + "\n");
         }
     }
-
-    // while loop example
-    int i = 0;
-    while (i < 5) {
-        int j = 0;
-        while (j < 5) {
-            print((string) arr[i][j] + " ");
-            j += 1;
-        }
-        print("\n");
-        i += 1;
-    }
-
     return 0;
 }
