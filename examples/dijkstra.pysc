@@ -80,6 +80,8 @@ int main() {
         }
     }
 
+    print("Output the edges in the form `a b w` such that there is a directed edge from `a` to `b` with weight `w`.\n");
+
     // Inserts each edge into the adjacency matrix. If there are multi-edges, take the edge with the minimum weight.
     for (int i = 1; i <= m; i += 1) {
         print("Edge #" + (string) i + " > ");
@@ -110,10 +112,7 @@ int main() {
 
     // Insert start node into heap.
     int end = 1; // Heap is one-indexed, and `end` represents the lowest empty index of the heap.
-    heap_insert(heap, end, {
-        0,
-        s
-    });
+    heap_insert(heap, end, {0, s});
     end += 1;
 
     // Distance of start node is 0.
@@ -148,6 +147,8 @@ int main() {
             }
         }
     }
+
+    print("\n");
 
     if (dist[e] == INF) {
         print("No path was found.\n");
