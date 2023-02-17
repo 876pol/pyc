@@ -134,10 +134,7 @@ int main() {
             if (graph[node][i] == INF) continue;
 
             // Inserts the path from `s` to `i` into the graph.
-            heap_insert(heap, end, {
-                curr_dist + graph[node][i],
-                i
-            });
+            heap_insert(heap, end, {curr_dist + graph[node][i], i});
             end += 1;
 
             // If this path is smaller than `dist[i]`, update the `dist` and `from` arrays accordingly.
