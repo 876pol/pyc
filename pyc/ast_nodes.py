@@ -30,7 +30,7 @@ class ValueLiteralNode(ASTNode):
 
 class InitializerListLiteralNode(ASTNode):
     """
-    Node that represents a list literal.
+    Node that represents an initializer list.
 
     Attributes:
         value (List[ASTNode]): the list object held by this node.

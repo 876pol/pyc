@@ -16,10 +16,16 @@ def main():
     # Check if the user provided a source file.
     if len(sys.argv) <= 1:
         raise FileNotFoundError("No source file provided")
-
-    # Read the source code into a variable.
-    file = open(sys.argv[1], "r")
-    code = file.read()
+    
+    if sys.argv[1] == "-c":
+        # Pulls source code from command line argument.
+        if len(sys.argv) <= 2:
+            raise FileNotFoundError("No code provided")
+        code = sys.argv[2]
+    else:
+        # Read the source code into a variable.
+        file = open(sys.argv[1], "r")
+        code = file.read()
 
     # Starts the interpreter.
     lexer = Lexer(code)

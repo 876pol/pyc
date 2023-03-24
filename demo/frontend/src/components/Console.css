@@ -1,0 +1,35 @@
+.output-container {
+    flex: 1;
+    height: 100%;
+    padding: 10px;
+    background-color: #050505;
+    color: white;
+    font-family: monospace;
+    overflow: auto;
+    font-size: large;
+}
+
+.output-container div {
+    padding: 4px 0;
+}
+
+.console {
+    overflow-y: auto;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.input-bar {
+    font-size: large;
+    position: absolute;
+    bottom: 10px;
+    color: white;
+    font-family: monospace;
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
