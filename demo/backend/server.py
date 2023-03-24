@@ -1,7 +1,6 @@
 import json
 import os
 import sys
-import traceback
 sys.path.append('../../')
 
 import asyncio
