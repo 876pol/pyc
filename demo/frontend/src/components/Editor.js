@@ -27,7 +27,7 @@ function Editor({ code, setCode, width, setWidth }) {
                 fontSize={16}
                 width={`${width}px`}
                 height="100%"
-                showPrintMargin={true}
+                showPrintMargin={false}
                 showGutter={true}
                 highlightActiveLine={true}
                 editorProps={{ $blockScrolling: Infinity }}

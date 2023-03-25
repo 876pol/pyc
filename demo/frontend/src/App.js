@@ -8,7 +8,11 @@ var socket = null;
 
 function App() {
   // Initialize state variables
-  const [code, setCode] = useState("int main() {\n  return 0;\n}");
+  const [code, setCode] = useState(`int main() {
+  print("Hello world!\\n");
+  return 0;
+}
+`);
   const [output, setOutput] = useState("");
   const [width, setWidth] = useState(window.innerWidth / 2);
   const [codeIsRunning, setCodeIsRunning] = useState(false);
@@ -24,7 +28,7 @@ function App() {
         await socket.close();
       } else {
         // Create a new WebSocket connection
-        socket = new WebSocket("ws://localhost:8000/ws");
+        socket = new WebSocket("wss://pyc-backend.fly.dev/ws");
 
         // Set up event listeners for the WebSocket connection
         socket.onopen = () => {

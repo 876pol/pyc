@@ -1,20 +1,11 @@
 import "./Header.css";  // import Header.css styles
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
+import { useState, useEffect } from "react";
 
 // Array of example codes
-const examples = [
-  {
-    name: "Hello World",
-    code: `int main() {
-  print("Hello world!\\n");
-  return 0;
-}
-`,
-  },
-  {
-    name: "FizzBuzz",
-    code: `int main() {
+let examples = [
+  `int main() {
   for (int i = 0; i < 20; i += 1) {
     if (i % 15 == 0) {
       print("FizzBuzz\\n");
@@ -28,12 +19,8 @@ const examples = [
   }
   return 0;
 }
-`,
-  },
-  {
-    name: "Merge Sort",
-    code: `/*
-  Implementation of Merge Sort in pyc.
+`, `/*
+  Implementation of Merge Sort in PYC.
 */
 
 
@@ -122,16 +109,254 @@ int main() {
   printArray(arr, arr_size);
   return 0;
 }
-`,
+`, `/*
+  Implementation of Bubble Sort in PYC.
+*/
+
+void bubbleSort(int arr[], int n) {
+  for (int i = 0; i < n - 1; i += 1) {
+    for (int j = 0; j < n - i - 1; j += 1) {
+      if (arr[j] > arr[j + 1]) {
+        int temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+      }
+    }
+  }
+}
+
+int main() {
+  int a[6] = {1, 6, 9, 3, 5, 4};
+  
+  print("The initial array is: ");
+  for (int i = 0; i < 6; i += 1) {
+    print((string) a[i] + " ");
+  }
+  print("\\n");
+  
+  bubbleSort(a, 6);
+  
+  print("The sorted array is: ");
+  for (int i = 0; i < 6; i += 1) {
+    print((string) a[i] + " ");
+  }
+  print("\\n");
+  return 0;
+}
+`, `/*
+    Tic-Tac-Toe game written in pyc.
+*/
+
+string grid[3][3] = {
+  {
+    " ",
+    " ",
+    " "
   },
+  {
+    " ",
+    " ",
+    " "
+  },
+  {
+    " ",
+    " ",
+    " "
+  }
+};
+
+// Function that prints the Tic-Tac-Toe grid.
+void print_grid() {
+  for (int i = 0; i < 3; i += 1) {
+    print("|");
+    for (int j = 0; j < 3; j += 1) {
+      print((string) grid[i][j] + "|");
+    }
+    print("\\n");
+  }
+  print("\\n");
+}
+
+// Function that checks if a player has won.
+int game_over() {
+  // Check diagonals.
+  if ((grid[0][0] == grid[1][1] && grid[1][1] == grid[2][2] && grid[0][0] != " ") ||
+    (grid[2][0] == grid[1][1] && grid[1][1] == grid[0][2] && grid[2][0] != " ")) {
+    return 1;
+  }
+  // Check horizontal and vertical lines.
+  for (int i = 0; i < 3; i += 1) {
+    if ((grid[i][0] == grid[i][1] && grid[i][1] == grid[i][2] && grid[i][0] != " ") ||
+      (grid[0][i] == grid[1][i] && grid[1][i] == grid[2][i] && grid[0][i] != " ")) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+// Main function.
+int main() {
+  int turn = 1; // The current player's turn.
+
+  for (int i = 0; i < 9; i += 1) {
+    // Prints messages
+    print_grid();
+    print("It is Player " + (string) turn + "'s turn\\n");
+    print("Where do you want to place your token? Type a number from 1 to 9.\\n");
+
+    // Gets user input and validates it.
+    int is_valid = 1;
+    int choice = 0;
+    do {
+      is_valid = 1;
+      choice = (int) scan() - 1;
+      if (choice < 0 || choice > 8) {
+        is_valid = 0;
+        print("Invalid Input.\\n");
+      } else if (grid[choice / 3][choice % 3] != " ") {
+        is_valid = 0;
+        print("Invalid Input.\\n");
+      }
+    } while (!is_valid);
+
+    // Sets the game board based on the player's move.
+    if (turn == 1) {
+      grid[choice / 3][choice % 3] = "O";
+    } else {
+      grid[choice / 3][choice % 3] = "X";
+    }
+
+    // Check if the player has won.
+    if (game_over()) {
+      print_grid();
+      print("Player " + (string) turn + " wins!\\n");
+      return 0;
+    }
+
+    // Change turn.
+    turn = !(turn - 1) + 1;
+  }
+
+  // If no one has won after nine moves, the game has tied.
+  print_grid();
+  print("Tie!\\n");
+
+  return 0;
+}
+`, `int binarySearch(int arr[], int l, int r, int x) {
+  while (l <= r) {
+    int mid = l + (r - l) / 2;
+    if (arr[mid] == x) {
+      return mid;
+    } else if (arr[mid] < x) {
+      l = mid + 1;
+    } else {
+      r = mid - 1;
+    }
+  }
+  return -1;
+}
+
+int main() {
+  int a[10] = {1, 2, 6, 8, 9, 12, 16, 20, 22, 24};
+  print("The array is: ");
+  for (int i = 0; i < 10; i += 1) {
+    print((string) a[i] + " ");
+  }
+  print("\\n\\n");
+  
+  int i1 = binarySearch(a, 0, 9, 6);
+  print("6 is located at index " + (string) i1 + "\\n");
+  int i2 = binarySearch(a, 0, 9, 12);
+  print("12 is located at index " + (string) i2 + "\\n");
+  int i3 = binarySearch(a, 0, 9, 24);
+  print("24 is located at index " + (string) i3 + "\\n");
+  
+  return 0;
+}
+`, `int main() {
+  int a[10] = {23, -5, 7, 0, 18, -12, 45, 9, -3, 33};
+  
+  print("The array is: ");
+  for (int i = 0; i < 10; i += 1) {
+    print((string) a[i] + " ");
+  }
+  print("\\n\\n");
+  
+  float sum = 0.0;
+  for (int i = 0; i < 10; i += 1) {
+    sum += a[i];
+  }
+  print("The average of the array is " + (string) (sum / 10) + "\\n");
+  
+  return 0;
+}
+`, `int fibonacci(int n) {
+  if (n <= 1) {
+    return n;
+  }
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+int main() {
+  print("Enter the value of n: ");
+  int n = (int) scan();
+  print("The " + (string) n + "th Fibonacci number is " + (string) fibonacci(n) + "\\n");
+  return 0;
+}
+`, `int gcd(int a, int b) {
+  if (b == 0) {
+    return a;
+  }
+  return gcd(b, a % b);
+}
+
+int main() {
+  print("Enter two integers: ");
+  int a = (int) scan();
+  int b = (int) scan();
+
+  print("The GCD of " + (string) a + " and " + (string) b +
+    " is " + (string) gcd(a, b));
+  return 0;
+}
+`, `int main() {
+  print("Enter the number of days: ");
+  int days = (int) scan();
+
+  int years = days / 365;
+  int weeks = (days % 365) / 7;
+  int remaining_days = days - (years * 365 + weeks * 7);
+
+  print((string) days + " day(s) = " + (string) years + " year(s), " +
+    (string) weeks + " week(s), and " + (string) remaining_days + " day(s)" + "\\n");
+  return 0;
+}
+`
 ];
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 
 
 function Header({ runCode, setCode, codeIsRunning }) {
+  const [exampleIndex, setExampleIndex] = useState(0);
+
+  // Shuffles the example array
+  useEffect(() => {
+    shuffleArray(examples);
+  }, []);
+
   // Function to load an example code by index
-  const loadExample = (index) => {
-    if (confirm(`By switching to '${examples[index].name}', you will lose your current code. Press OK to continue.`)) {
-      setCode(examples[index].code);
+  const loadExample = () => {
+    if (confirm(`By loading a random example, you will lose your current code. Press OK to continue.`)) {
+      setCode(examples[exampleIndex]);
+      setExampleIndex((exampleIndex + 1) % examples.length);
     }
   };
 
@@ -139,19 +364,10 @@ function Header({ runCode, setCode, codeIsRunning }) {
   return (
     <div className="header">
       <div className="logo">PYC Demo</div>
-      <div className="dropdown">
-        <div className="dropdown-button">Examples</div>
-        <div className="dropdown-content">
-          {/* Map through example codes and render a div for each one */}
-          {examples.map((example, index) => (
-            <div key={index} onClick={() => loadExample(index)}>{example.name}</div>
-          ))}
-        </div>
-      </div>
-      <div className="icon-button" onClick={() => window.open("https://github.com/876pol/pyc")}>
+      <div className="icon-button" onClick={() => window.open("https://github.com/876pol/pyc")} title="GitHub">
         <img src="/github-mark-white.svg" alt="GitHub" width="18px" />
       </div>
-      <Popup defaultOpen="true" trigger={<div className="icon-button"> <img src="/info.svg" alt="About" width="18px" /> </div>} modal>
+      <Popup defaultOpen="true" trigger={<div className="icon-button"> <img src="/info.svg" alt="About" width="18px" title="About"/> </div>} modal>
         {close => (
           <div className="modal">
             <button className="close" onClick={close}>
@@ -159,20 +375,24 @@ function Header({ runCode, setCode, codeIsRunning }) {
             </button>
             <div className="header"> PYC </div>
             <div className="content">
-              Welcome to PYC: the interpreted C-like programming language implemented in Python 3.
-              <br />
-              <br />
-              This demo editor, built using ReactJS on the frontend and FastAPI on the backend, allows you to write and test code in PYC. 
-              <br />
-              <br />
+              Welcome to PYC: an interpreted C-like programming language implemented in Python 3.
+              <br /><br />
+              This demo editor, built using ReactJS on the frontend and FastAPI on the backend, allows you to write and test code in PYC.
+              <br /><br />
               Explore the capabilities of PYC by trying out some example programs!
+              <br /><br />
+              The full documentation can be found <a href="https://github.com/876pol/pyc/blob/main/DOCUMENTATION.md" target="_blank" rel="noopener noreferrer" style={{ color: "#00bbff" }}>here</a>.
             </div>
           </div>
         )}
       </Popup>
+      <div className="icon-button" onClick={loadExample} title="Load Random Example">
+        <img src="/refresh.svg" alt="Random Example" width="18px" />
+      </div>
       <div
         className="icon-button"
         onClick={runCode}
+        title={(codeIsRunning) ? "Stop Code" : "Run Code"}
       >
         {
           (codeIsRunning) ?

@@ -1,15 +1,21 @@
 # pyc
 
-Interpreted C-like programming language written with Python 3. Created as my ICS3U (Grade 11 Computer Science) final.
+PYC is an interpreted C-like programming language written with Python 3.
+
+This repo also contains a demo editor, built using ReactJS on the frontend (hosted on Vercel) and FastAPI on the backend (hosted on Fly.io), allows you to write and test code in PYC. Test out PYC [here](https://pyc.vercel.app/)!
 
 ## Features
 
 - Initializing variables
 - Evaluating expressions
-- Control Structures
+- Control structures
 - Functions
 - Arrays
 - C-like syntax
+
+## Documentation
+
+See the full documentation [here](DOCUMENTATION.md).
 
 ## Installation
 
@@ -22,26 +28,3 @@ python pyc examples/hello_world.pysc
 ```
 
 More sample programs can be found in `/examples`.
-
-## Known Bugs / Limitations
-
-- Many error messages are not clear.
-- The standard library is limited (there are only functions for input and output).
-- pyc has a string data type instead of a char array (like in C), and string manipulation is not possible.
-- Features such as pointers or structs are unavailable.
-
-## Support
-
-Email: pchen1@ocdsb.ca
-
-## References
-
-<https://ruslanspivak.com/> (Learning about interpreters)
-
-<https://craftinginterpreters.com/> (Learning about interpreters)
-
-<https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form> (Learning about EBNF)
-
-<https://www.tutorialspoint.com/cprogramming/index.htm> (C programming language features)
-
-<https://stackoverflow.com/> (Debugging)

@@ -39,7 +39,7 @@ To read input from the user, you can use the `scan()` function. The `print()` fu
 ```c
 int main() {
     print("Enter your age: ");
-    int age = (string) scan();
+    int age = (int) scan();
     print("Your age is " + (string) age);
     return 0;
 }
@@ -113,7 +113,8 @@ int sum(int a, int b) {
 }
 
 int main() {
-    int x = 5, y = 10;
+    int x = 5;
+    int y = 10;
     int result = sum(x, y);
     print("The sum of " + (string) x + " and " + (string) y + " is " + (string) result + "\n");
     return 0;
