@@ -1,8 +1,8 @@
 .output-container {
     flex: 1;
     height: 100%;
-    padding: 10px;
-    background-color: #050505;
+    padding: 15px;
+    background-color: #26292c;
     color: white;
     font-family: monospace;
     overflow: auto;
@@ -25,11 +25,13 @@
 .input-bar {
     font-size: large;
     position: absolute;
-    bottom: 10px;
+    bottom: 15px;
     color: white;
     font-family: monospace;
     padding: 8px;
     border-radius: 5px;
     border: none;
     outline: none;
+    box-shadow: 2px 2px 2px #18191b;
+    transition: background-color 0.15s ease;
 }

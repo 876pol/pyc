@@ -364,10 +364,11 @@ function Header({ runCode, setCode, codeIsRunning }) {
   return (
     <div className="header">
       <div className="logo">PYC Demo</div>
-      <div className="icon-button" onClick={() => window.open("https://github.com/876pol/pyc")} title="GitHub">
-        <img src="/github-mark-white.svg" alt="GitHub" width="18px" />
+      <div className="icon-button" onClick={() => window.open("https://github.com/876pol/pyc")} style={{ backgroundColor: "#552277" }}>
+        <img src="/github-mark-white.svg" width="18px" />
+        <p>GitHub</p>
       </div>
-      <Popup defaultOpen="true" trigger={<div className="icon-button"> <img src="/info.svg" alt="About" width="18px" title="About"/> </div>} modal>
+      <Popup defaultOpen="true" trigger={<div className="icon-button" style={{ backgroundColor: "#225599" }}> <img src="/info.svg" width="18px"/> <p>About</p> </div>} modal>
         {close => (
           <div className="modal">
             <button className="close" onClick={close}>
@@ -386,19 +387,21 @@ function Header({ runCode, setCode, codeIsRunning }) {
           </div>
         )}
       </Popup>
-      <div className="icon-button" onClick={loadExample} title="Load Random Example">
-        <img src="/refresh.svg" alt="Random Example" width="18px" />
+      <div className="icon-button" onClick={loadExample} style={{ backgroundColor: "#a17900"}}>
+        <img src="/refresh.svg" width="18px" />
+        <p>Load Random Example</p>
       </div>
       <div
         className="icon-button"
         onClick={runCode}
-        title={(codeIsRunning) ? "Stop Code" : "Run Code"}
+        style={{width:"100px", backgroundColor: (codeIsRunning ? "#992222" : "#119955")}}
       >
         {
           (codeIsRunning) ?
-            <img src="/stop.svg" alt="Stop" width="15px" /> :
-            <img src="/run.svg" alt="Run" width="15px" />
+            <img src="/stop.svg" width="15px" /> :
+            <img src="/run.svg" width="15px" />
         }
+        <p>{(codeIsRunning) ? "Stop": "Run"}</p>
       </div>
     </div>
   );

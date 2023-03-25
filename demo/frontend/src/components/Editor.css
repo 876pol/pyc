@@ -6,17 +6,17 @@
 .divider {
     width: 5px;
     height: 100%;
-    background-color: #333;
+    background-color: #393d41;
     cursor: col-resize;
     transition: background-color 0.1s ease;
 }
 
 .divider:hover {
-    background-color: #444;
+    background-color: #404549;
     transition: background-color 0.1s ease;
 }
 
 .divider:active {
-    background-color: #666;
+    background-color: #4b5257;
     transition: background-color 0.1s ease;
 }

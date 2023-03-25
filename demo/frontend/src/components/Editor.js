@@ -1,6 +1,6 @@
 import AceEditor from "react-ace";  // Import AceEditor component
 import "ace-builds/src-noconflict/mode-c_cpp";  // Import Python syntax highlighting
-import "ace-builds/src-noconflict/theme-monokai";  // Import monokai theme
+import "ace-builds/src-noconflict/theme-tomorrow_night";  // Import monokai theme
 import "./Editor.css";  // Import Editor.css styles
 
 function Editor({ code, setCode, width, setWidth }) {
@@ -20,7 +20,7 @@ function Editor({ code, setCode, width, setWidth }) {
         <div style={{ display: "flex" }}>
             <AceEditor
                 mode="c_cpp"
-                theme="monokai"
+                theme="tomorrow_night"
                 name="code-editor"
                 value={code}
                 onChange={setCode}

@@ -31,15 +31,16 @@ function Console({ sendInputToCode, output, width, codeIsRunning }) {
       <input
         className="input-bar"
         style={{
-          width: `calc(100% - ${width}px - 20px)`, // Set the width of the input bar
+          width: `calc(100% - ${width}px - 35px)`, // Set the width of the input bar
           cursor: codeIsRunning ? "auto" : "not-allowed", // Change the cursor style based on whether code is running or not
-          backgroundColor: codeIsRunning ? "#333" : "#222" // Change the background color based on whether code is running or not
+          backgroundColor: codeIsRunning ? "#3a4144" : "#2e3237" // Change the background color based on whether code is running or not
         }}
         type="text"
         value={inputValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         disabled={!codeIsRunning} // Disable the input bar when code is not running
+        placeholder={!codeIsRunning ? "" : "Input goes here..."}
       ></input>
     </div>
   )
