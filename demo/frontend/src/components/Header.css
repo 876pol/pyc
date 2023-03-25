@@ -13,8 +13,14 @@
     font-size: 24px;
     align-items: center;
     justify-content: center;
-    height: 100%;
-    padding-left: 15px;
+    height: 40px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+    color: #fff;
+    background-color: #333;
+    padding: 15px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
 }
 
 .icon-button {

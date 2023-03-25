@@ -1,19 +1,20 @@
 import "./Header.css";  // import Header.css styles
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 
-function Header({ runCode, setCode, codeIsRunning }) {
-  // Array of example codes
-  const examples = [
-    {
-      name: "Hello World",
-      code: `int main() {
+// Array of example codes
+const examples = [
+  {
+    name: "Hello World",
+    code: `int main() {
   print("Hello world!\\n");
   return 0;
 }
 `,
-    },
-    {
-      name: "FizzBuzz",
-      code: `int main() {
+  },
+  {
+    name: "FizzBuzz",
+    code: `int main() {
   for (int i = 0; i < 20; i += 1) {
     if (i % 15 == 0) {
       print("FizzBuzz\\n");
@@ -28,10 +29,10 @@ function Header({ runCode, setCode, codeIsRunning }) {
   return 0;
 }
 `,
-    },
-    {
-      name: "Merge Sort",
-      code: `/*
+  },
+  {
+    name: "Merge Sort",
+    code: `/*
   Implementation of Merge Sort in pyc.
 */
 
@@ -122,9 +123,11 @@ int main() {
   return 0;
 }
 `,
-    },
-  ];
+  },
+];
 
+
+function Header({ runCode, setCode, codeIsRunning }) {
   // Function to load an example code by index
   const loadExample = (index) => {
     if (confirm(`By switching to '${examples[index].name}', you will lose your current code. Press OK to continue.`)) {
@@ -148,6 +151,25 @@ int main() {
       <div className="icon-button" onClick={() => window.open("https://github.com/876pol/pyc")}>
         <img src="/github-mark-white.svg" alt="GitHub" width="18px" />
       </div>
+      <Popup defaultOpen="true" trigger={<div className="icon-button"> <img src="/info.svg" alt="About" width="18px" /> </div>} modal>
+        {close => (
+          <div className="modal">
+            <button className="close" onClick={close}>
+              &times;
+            </button>
+            <div className="header"> PYC </div>
+            <div className="content">
+              Welcome to PYC: the interpreted C-like programming language implemented in Python 3.
+              <br />
+              <br />
+              This demo editor, built using ReactJS on the frontend and FastAPI on the backend, allows you to write and test code in PYC. 
+              <br />
+              <br />
+              Explore the capabilities of PYC by trying out some example programs!
+            </div>
+          </div>
+        )}
+      </Popup>
       <div
         className="icon-button"
         onClick={runCode}

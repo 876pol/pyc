@@ -62,7 +62,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 stdout_buffer.extend(list(map(chr, await proc.stdout.read()))) 
                 await websocket.send_text(json.dumps({"output": "".join(stdout_buffer)}))
                 stdout_buffer.clear()
-                await websocket.send_text(json.dumps({"output": f"\nProcess finished with return code: {proc.returncode}"}))
+                await websocket.send_text(json.dumps({"output": f"\r\nProcess finished with return code: {proc.returncode}\r\n"}))
                 await websocket.close()
                 break
 
@@ -100,5 +100,5 @@ async def websocket_endpoint(websocket: WebSocket):
         # If an error occurs, send the error message to the client and close the WebSocket connection.
         if proc is not None and proc.returncode is None:
             proc.kill()
-        await websocket.send_text(json.dumps({"output": f"\nError: {e}"}))
+        await websocket.send_text(json.dumps({"output": f"\r\nError: {e}\r\n"}))
         await websocket.close()

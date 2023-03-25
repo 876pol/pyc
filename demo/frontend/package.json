@@ -13,8 +13,10 @@
     "react-resizable": "^3.0.4",
     "react-scripts": "5.0.1",
     "react-syntax-highlighter": "^15.5.0",
+    "reactjs-popup": "^2.0.5",
     "styled-components": "^5.3.9",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xterm-addon-fit": "^0.7.0"
   },
   "scripts": {
     "start": "react-scripts start",
