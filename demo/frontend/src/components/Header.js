@@ -317,7 +317,7 @@ int main() {
   int b = (int) scan();
 
   print("The GCD of " + (string) a + " and " + (string) b +
-    " is " + (string) gcd(a, b));
+    " is " + (string) gcd(a, b) + "\\n");
   return 0;
 }
 `, `int main() {
@@ -364,11 +364,11 @@ function Header({ runCode, setCode, codeIsRunning }) {
   return (
     <div className="header">
       <div className="logo">PYC Demo</div>
-      <div className="icon-button" onClick={() => window.open("https://github.com/876pol/pyc")} style={{ backgroundColor: "#552277" }}>
+      <div className="icon-button github-button" onClick={() => window.open("https://github.com/876pol/pyc")}>
         <img src="/github-mark-white.svg" width="18px" />
         <p>GitHub</p>
       </div>
-      <Popup defaultOpen="true" trigger={<div className="icon-button" style={{ backgroundColor: "#225599" }}> <img src="/info.svg" width="18px"/> <p>About</p> </div>} modal>
+      <Popup defaultOpen="true" trigger={<div className="icon-button about-button"> <img src="/info.svg" width="18px"/> <p>About</p> </div>} modal>
         {close => (
           <div className="modal">
             <button className="close" onClick={close}>
@@ -387,14 +387,13 @@ function Header({ runCode, setCode, codeIsRunning }) {
           </div>
         )}
       </Popup>
-      <div className="icon-button" onClick={loadExample} style={{ backgroundColor: "#a17900"}}>
+      <div className="icon-button load-example-button" onClick={loadExample}>
         <img src="/refresh.svg" width="18px" />
         <p>Load Random Example</p>
       </div>
       <div
-        className="icon-button"
+        className={"icon-button " + ((codeIsRunning) ? "stop-button" : "run-button")}
         onClick={runCode}
-        style={{width:"100px", backgroundColor: (codeIsRunning ? "#992222" : "#119955")}}
       >
         {
           (codeIsRunning) ?

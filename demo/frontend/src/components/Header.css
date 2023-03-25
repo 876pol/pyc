@@ -9,7 +9,7 @@
 .logo {
     float: left;
     display: flex;
-    color: #cccccc;
+    color: #dddddd;
     font-size: 24px;
     align-items: center;
     justify-content: center;
@@ -37,10 +37,51 @@
     margin-left: 6px;
     margin-right: 6px;
     padding: 0px 15px;
-    background-color: #22262c;
     box-shadow: 2px 2px 2px 2px rgba(12, 12, 12, 0.3);
 }
 
 .icon-button p {
     margin-left: 10px;
+}
+
+.run-button {
+    width: 100px;
+    background-color: #119955;
+}
+
+.run-button:hover {
+    background-color: #05904a;
+}
+
+.stop-button {
+    width: 100px;
+    background-color: #992222;
+}
+
+.stop-button:hover {
+    background-color: #891212;
+}
+
+.load-example-button {
+    background-color: #a17900;
+}
+
+.load-example-button:hover {
+    background-color: #916700;
+}
+
+.about-button {
+    background-color: #225599;
+}
+
+.about-button:hover {
+    background-color: #1b4677;
+}
+
+.github-button {
+    background-color: #552277;
+}
+
+.github-button:hover {
+    background-color: #461e5d;
 }
