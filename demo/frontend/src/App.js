@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Editor from "./components/Editor";
 import Header from "./components/Header";
 import Console from "./components/Console";
@@ -16,6 +16,11 @@ function App() {
   const [output, setOutput] = useState("");
   const [width, setWidth] = useState(window.innerWidth / 2);
   const [codeIsRunning, setCodeIsRunning] = useState(false);
+
+  // Set document title
+  useEffect(() => {
+    document.title = "PYC Demo";
+  }, []);
 
   // Define function to start running the code
   const startRunningCode = async () => {
