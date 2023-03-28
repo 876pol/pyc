@@ -6,7 +6,7 @@ PYC offers three main data types: `int`, `float`, and `string`. Arrays and multi
 
 ## Declaration of Variables and Arrays
 
-Variables in C must be declared before they can be used. The syntax for declaring a variable is:
+Variables in PYC must be declared before they can be used. The syntax for declaring a variable is:
 
 ```c
 data_type variable_name;
